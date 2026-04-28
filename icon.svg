@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 背景（マスカブル：safe area考慮で全面塗り） -->
+  <rect width="512" height="512" fill="#1b2b4b"/>
+  <!-- 歯のシンボル -->
+  <g transform="translate(256 256)">
+    <path d="M 0 -120
+             C -70 -120 -110 -80 -110 -30
+             C -110 10 -100 50 -85 90
+             C -75 115 -65 130 -50 130
+             C -38 130 -32 115 -28 90
+             C -22 55 -12 40 0 40
+             C 12 40 22 55 28 90
+             C 32 115 38 130 50 130
+             C 65 130 75 115 85 90
+             C 100 50 110 10 110 -30
+             C 110 -80 70 -120 0 -120 Z"
+          fill="#ffffff" opacity="0.95"/>
+    <!-- ハイライト -->
+    <path d="M -60 -80
+             C -75 -65 -82 -45 -82 -25
+             C -82 -10 -80 5 -76 18"
+          stroke="#e8eef8" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.7"/>
+  </g>
+  <!-- 下部ラベル風アクセント -->
+  <rect x="156" y="410" width="200" height="6" rx="3" fill="#3a5fa0"/>
+</svg>

@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>歯科技工指示書</title>
+
+<!-- ===== PWA ===== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b2b4b">
+<meta name="application-name" content="歯科技工指示書">
+<meta name="description" content="歯科技工指示書の作成・印刷フォーム">
+
+<!-- iOS (Safariでホーム画面追加時にスタンドアロン表示する) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="技工指示書">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- 通常アイコン -->
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1b2b4b;
+  --navy-mid: #2c3f63;
+  --blue: #3a5fa0;
+  --blue-light: #e8eef8;
+  --line: #c8d4e8;
+  --line-light: #dde6f2;
+  --bg: #f0f4fa;
+  --white: #ffffff;
+  --text: #1a1f2e;
+  --text-mid: #4a5568;
+  --text-light: #8a9ab8;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --input-bg: #f7f9fd;
+  --tooth-empty: #eef2fa;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(27,43,75,0.10);
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN", "Noto Sans JP", "Yu Gothic", YuGothic, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px 12px 32px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.form-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.form-header {
+  background: var(--navy);
+  padding: 14px 24px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.form-header h1 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+.header-sub {
+  color: rgba(255,255,255,0.6);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* 技工所情報（中央） */
+.lab-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px 18px;
+  border-left: 1px solid rgba(255,255,255,0.18);
+  border-right: 1px solid rgba(255,255,255,0.18);
+  flex-shrink: 0;
+}
+.lab-brand-tag {
+  color: rgba(255,255,255,0.55);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.lab-brand-en {
+  color: #fff;
+  font-family: "Cinzel", "Trajan Pro", "Times New Roman", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.05;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+  white-space: nowrap;
+}
+.lab-brand-jp {
+  color: rgba(255,255,255,0.92);
+  font-family: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "YuMincho", serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+.form-body { padding: 0; }
+.section { border-bottom: 1px solid var(--line); }
+.section:last-child { border-bottom: none; }
+.section-head {
+  background: var(--navy-mid);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 5px 16px;
+}
+
+.row { display: grid; border-bottom: 1px solid var(--line-light); }
+.row:last-child { border-bottom: none; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+
+.field {
+  padding: 8px 14px;
+  border-right: 1px solid var(--line-light);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field:last-child { border-right: none; }
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.field input[type="text"],
+.field input[type="date"],
+.field textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 40px;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  background: #fff;
+}
+
+.gender-age { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.gender-radio-group { display: flex; gap: 6px; }
+.gender-radio {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: 40px;
+}
+.gender-radio input[type="radio"] {
+  width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;
+}
+.gender-radio:has(input:checked) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.age-input-wrap { display: flex; align-items: center; gap: 5px; }
+.gender-age input[type="text"] { width: 70px; text-align: center; font-size: 15px; min-height: 40px; }
+.gender-age span { font-size: 14px; color: var(--text-mid); }
+
+/* シェード */
+.shade-grid {
+  padding: 10px 14px 12px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+.shade-btn {
+  padding: 8px 4px;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-mid);
+  cursor: pointer;
+  text-align: center;
+  min-height: 38px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.shade-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.shade-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* 歯式 */
+.tooth-num-grid { padding: 8px 14px 10px; }
+.tooth-arch { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.arch-row { display: flex; gap: 4px; }
+.arch-side { display: flex; gap: 4px; }
+.arch-divider { width: 2px; background: var(--line); margin: 0 5px; }
+.arch-label { font-size: 10px; color: var(--text-light); margin: 1px 0; letter-spacing: 0.05em; font-weight: 700; }
+.tooth-btn {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--line);
+  background: var(--white);
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-mid);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: inherit;
+}
+.tooth-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.tooth-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-size: 15px; }
+.tooth-note-row { padding: 0 14px 8px; }
+
+/* 金属 */
+.metal-checks { padding: 8px 14px 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.check-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; cursor: pointer;
+  padding: 5px 10px; border-radius: 5px;
+}
+.check-item:hover { background: var(--blue-light); }
+.check-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+.metal-other-wrap { display: flex; align-items: center; gap: 6px; }
+.metal-other-wrap input[type="text"] {
+  width: 140px; padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px;
+  background: var(--input-bg);
+  font-family: inherit;
+  min-height: 36px;
+}
+
+/* 技工物（縦に詰める） */
+.gikou-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line-light); }
+.gikou-col { padding: 8px 12px 10px; border-right: 1px solid var(--line-light); }
+.gikou-col:last-child { border-right: none; }
+.gikou-col-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--navy);
+  background: var(--blue-light);
+  padding: 3px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.gikou-group { margin-bottom: 6px; }
+.gikou-group-name {
+  font-size: 11px; font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-bottom: 3px;
+  display: inline-block;
+}
+.gikou-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2px 4px; border-radius: 3px; margin-bottom: 1px;
+  flex-wrap: wrap; gap: 6px;
+}
+.gikou-row:hover { background: var(--blue-light); }
+.gikou-part { font-size: 12px; color: var(--text-mid); min-width: 100px; font-weight: 500; }
+.gikou-check-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.gikou-check {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; cursor: pointer; color: var(--text);
+  padding: 2px 5px; border-radius: 3px;
+}
+.gikou-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+/* 補綴の図 */
+.figure-half-area {
+  background: var(--tooth-empty);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  min-height: 80px;
+  margin: 5px 0 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  color: var(--text-light);
+  font-size: 11px;
+  cursor: pointer;
+  position: relative;
+}
+.figure-half-area:hover { border-color: var(--accent); background: var(--accent-soft); }
+.figure-half-area input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.figure-half-area img { max-width: 100%; max-height: 70px; border-radius: 4px; display: none; }
+.figure-icon { font-size: 26px; opacity: 0.4; }
+
+/* 補綴名 詳細テキストエリア */
+.hotestu-detail {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  min-height: 70px;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.hotestu-detail:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  background: #fff;
+}
+
+/* 特記事項（縦長） */
+.note-full { padding: 10px 14px 12px; }
+.note-tab-bar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.note-tab-btn {
+  padding: 8px 18px;
+  font-size: 13px; font-weight: 700;
+  font-family: inherit;
+  background: var(--white); color: var(--text-mid);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer; min-height: 38px;
+}
+.note-tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.note-pane { display: none; }
+.note-pane.active { display: block; }
+.note-pane textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  min-height: 240px;
+  line-height: 1.7;
+  resize: vertical;
+}
+.note-pane textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  background: #fff;
+}
+
+/* キャンバス */
+.canvas-toolbar {
+  display: flex; gap: 6px; align-items: center;
+  margin-bottom: 6px; flex-wrap: wrap;
+  padding: 6px;
+  background: var(--blue-light);
+  border-radius: var(--radius);
+}
+.canvas-tool-btn {
+  padding: 7px 14px;
+  font-size: 13px; font-weight: 700;
+  font-family: inherit;
+  background: var(--white); color: var(--text-mid);
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer; min-height: 36px;
+}
+.canvas-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+.canvas-tool-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.canvas-tool-btn.danger:hover { border-color: #dc2626; color: #dc2626; }
+.canvas-color-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  cursor: pointer;
+  outline: 1.5px solid var(--line);
+}
+.canvas-color-btn.active { outline: 2.5px solid var(--accent); transform: scale(1.1); }
+.canvas-size-label { font-size: 12px; color: var(--text-mid); font-weight: 600; margin-left: 3px; }
+.canvas-size-slider { width: 90px; }
+.canvas-wrap {
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  position: relative; overflow: hidden;
+}
+.draw-canvas {
+  display: block; width: 100%;
+  height: 280px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* ファイル名バー */
+.filename-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, #f8fbff, #eef4fc);
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.filename-label {
+  font-size: 12px; font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.05em; white-space: nowrap;
+}
+.filename-display {
+  flex: 1; min-width: 220px;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  word-break: break-all;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.filename-display:hover { border-color: var(--accent); background: #fdfeff; }
+.filename-display.copied { background: #dcfce7; border-color: #16a34a; color: #166534; }
+.filename-hint {
+  width: 100%;
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.55;
+  margin-top: 2px;
+}
+
+/* アクションバー */
+.action-bar {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 18px;
+  background: var(--blue-light);
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 13px 28px;
+  border-radius: var(--radius);
+  font-size: 15px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer; border: none;
+  letter-spacing: 0.05em;
+  min-height: 50px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-print { background: var(--navy); color: #fff; font-size: 16px; padding: 13px 32px; }
+.btn-clear { background: var(--white); color: var(--text-mid); border: 1.5px solid var(--line); }
+.btn:hover { opacity: 0.85; }
+
+/* トースト */
+.toast {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #16a34a; color: #fff;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 14px; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 9999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== PRINT (A4 1ページ最適化) ===== */
+@media print {
+  html, body {
+    background: #fff !important;
+    padding: 0 !important; margin: 0 !important;
+    font-size: 8.5px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  .form-wrap {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+  .action-bar, .filename-bar, .toast { display: none !important; }
+
+  .form-header {
+    background: #fff !important;
+    border-bottom: 1.5px solid #1b2b4b !important;
+    padding: 4px 10px !important;
+  }
+  .form-header h1 { color: #1b2b4b !important; font-size: 13px !important; letter-spacing: 0.15em !important; }
+  .header-sub { color: #666 !important; font-size: 8px !important; }
+
+  /* 技工所ブランド（印刷） */
+  .lab-brand {
+    border-color: #ccc !important;
+    padding: 0 12px !important;
+  }
+  .lab-brand-tag {
+    color: #888 !important;
+    font-size: 6.5px !important;
+    margin-bottom: 1px !important;
+  }
+  .lab-brand-en {
+    color: #1b2b4b !important;
+    font-size: 14px !important;
+    text-shadow: none !important;
+    letter-spacing: 0.16em !important;
+  }
+  .lab-brand-jp {
+    color: #1b2b4b !important;
+    font-size: 8px !important;
+    margin-top: 1px !important;
+  }
+
+  .section { page-break-inside: avoid; }
+  .section-head {
+    background: #e8eef8 !important;
+    color: #1b2b4b !important;
+    font-size: 8.5px !important;
+    padding: 2px 8px !important;
+    page-break-after: avoid;
+  }
+
+  .field { padding: 3px 8px !important; gap: 2px !important; }
+  .field-label { font-size: 8px !important; }
+  .field input, .field textarea {
+    border: none !important;
+    border-bottom: 1px solid #aaa !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 2px 2px !important;
+    font-size: 9px !important;
+    min-height: auto !important;
+  }
+  .gender-radio {
+    border: 1px solid #aaa !important;
+    background: #fff !important;
+    padding: 1px 6px !important;
+    min-height: auto !important;
+    font-size: 8.5px !important;
+  }
+  .gender-radio:has(input:checked) {
+    background: #1b2b4b !important; color: #fff !important; border-color: #1b2b4b !important;
+  }
+  .gender-radio input[type="radio"] { width: 9px !important; height: 9px !important; }
+  .gender-age input[type="text"] { width: 36px !important; }
+
+  .shade-grid {
+    padding: 3px 8px 4px !important;
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 2px !important;
+  }
+  .shade-btn {
+    padding: 1px 1px !important;
+    min-height: 16px !important;
+    font-size: 8px !important;
+    border: 1px solid #ddd !important;
+    color: #bbb !important;
+  }
+  .shade-btn.active {
+    background: #1b2b4b !important; color: #fff !important; border-color: #1b2b4b !important;
+  }
+
+  .figure-half-area {
+    border-color: #aaa !important;
+    background: #fafafa !important;
+    min-height: 50px !important;
+    margin-top: 3px !important;
+  }
+  .figure-half-area input[type="file"] { display: none !important; }
+  .figure-icon { display: none !important; }
+  .figure-half-area > div:not(.figure-icon) { display: none !important; }
+  .figure-half-area img { max-height: 50px !important; display: block !important; }
+
+  /* 補綴名 詳細テキストエリア（印刷） */
+  .hotestu-detail {
+    border: none !important;
+    border-bottom: 1px solid #aaa !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 3px 4px !important;
+    font-size: 9px !important;
+    min-height: 36px !important;
+    line-height: 1.4 !important;
+  }
+
+  .tooth-num-grid { padding: 3px 8px 4px !important; }
+  .tooth-arch { gap: 1px !important; }
+  .arch-label { font-size: 7px !important; margin: 0 !important; }
+  .arch-row, .arch-side { gap: 2px !important; }
+  .tooth-btn {
+    border: 1px solid #aaa !important;
+    width: 20px !important; height: 20px !important;
+    font-size: 9px !important;
+    background: #fff !important; color: #444 !important;
+  }
+  .tooth-btn.active {
+    background: #1b2b4b !important; color: #fff !important;
+    border-color: #1b2b4b !important; font-size: 10px !important;
+  }
+  .tooth-note-row { padding: 0 8px 3px !important; }
+
+  .metal-checks { padding: 3px 8px 4px !important; gap: 6px !important; }
+  .check-item { padding: 0 2px !important; font-size: 9px !important; }
+  .check-item input[type="checkbox"] { width: 9px !important; height: 9px !important; }
+  .metal-other-wrap input[type="text"] {
+    width: 90px !important; min-height: auto !important;
+    padding: 1px 4px !important; font-size: 9px !important;
+  }
+
+  .gikou-col { padding: 3px 8px !important; }
+  .gikou-col-title { font-size: 9px !important; padding: 1px 6px !important; margin-bottom: 2px !important; }
+  .gikou-group { margin-bottom: 2px !important; }
+  .gikou-group-name { font-size: 8.5px !important; padding: 1px 5px !important; margin-bottom: 1px !important; }
+  .gikou-row { padding: 0 2px !important; margin-bottom: 0 !important; gap: 4px !important; }
+  .gikou-row:hover { background: transparent !important; }
+  .gikou-part { font-size: 8.5px !important; min-width: 70px !important; }
+  .gikou-check { font-size: 8.5px !important; padding: 0 2px !important; gap: 2px !important; }
+  .gikou-check input[type="checkbox"] { width: 9px !important; height: 9px !important; }
+
+  .note-full { padding: 3px 8px 4px !important; }
+  .note-tab-bar { display: none !important; }
+  .note-pane { display: none !important; }
+  .note-pane.has-content { display: block !important; }
+  .note-pane textarea {
+    border: 1px solid #aaa !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+    min-height: 90px !important;
+    width: 100% !important;
+  }
+  .canvas-toolbar { display: none !important; }
+  .canvas-wrap { border: 1px solid #aaa !important; }
+  .draw-canvas { height: 110px !important; }
+
+  @page { size: A4 portrait; margin: 6mm 6mm; }
+}
+
+/* ===== iPad / mobile ===== */
+@media (max-width: 760px) {
+  html { font-size: 15px; }
+  body { padding: 10px 6px 32px; }
+  .row-2 { grid-template-columns: 1fr; }
+  .field { border-right: none; border-bottom: 1px solid var(--line-light); }
+  .gikou-grid { grid-template-columns: 1fr; }
+  .gikou-col { border-right: none; border-bottom: 1px solid var(--line-light); }
+  .form-header {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+  .form-header h1 { font-size: 16px; }
+  .lab-brand {
+    padding: 4px 12px;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+    width: 100%;
+    order: 3;
+  }
+  .lab-brand-en { font-size: 18px; }
+  .lab-brand-jp { font-size: 10px; }
+  .tooth-btn { width: 32px; height: 32px; font-size: 13px; }
+  .tooth-btn.active { font-size: 14px; }
+  .arch-row, .arch-side { gap: 3px; }
+  .shade-grid { grid-template-columns: repeat(5, 1fr); }
+  .draw-canvas { height: 240px; }
+}
+</style>
+</head>
+<body>
+
+<div class="form-wrap">
+
+  <div class="form-header">
+    <div class="form-header-left">
+      <h1>技 工 指 示 書</h1>
+      <div class="header-sub">DENTAL LAB WORK ORDER</div>
+    </div>
+    <div class="lab-brand">
+      <div class="lab-brand-tag">技工所名</div>
+      <div class="lab-brand-en">OKUMURASHIKEN</div>
+      <div class="lab-brand-jp">有限会社　奥村歯研</div>
+    </div>
+    <div class="header-sub" id="today-date"></div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- ① 基本情報 -->
+    <div class="section">
+      <div class="section-head">基本情報</div>
+      <div class="row row-2">
+        <div class="field">
+          <div class="field-label">医院名</div>
+          <input type="text" placeholder="例：〇〇歯科クリニック">
+        </div>
+        <div class="field">
+          <div class="field-label">発行日</div>
+          <input type="date" id="issue-date">
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 患者情報 -->
+    <div class="section">
+      <div class="section-head">患者情報</div>
+      <div class="row row-2">
+        <div class="field">
+          <div class="field-label">患者名</div>
+          <input type="text" id="patient-name" placeholder="例：山田 太郎">
+        </div>
+        <div class="field">
+          <div class="field-label">装着日</div>
+          <input type="date">
+        </div>
+      </div>
+      <div class="row row-2">
+        <div class="field">
+          <div class="field-label">性別 / 年齢</div>
+          <div class="gender-age">
+            <div class="gender-radio-group">
+              <label class="gender-radio"><input type="radio" name="gender" value="男"> 男</label>
+              <label class="gender-radio"><input type="radio" name="gender" value="女"> 女</label>
+            </div>
+            <div class="age-input-wrap">
+              <input type="text" placeholder="00" maxlength="3" inputmode="numeric">
+              <span>才</span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">試適日</div>
+          <input type="date">
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 補綴名 -->
+    <div class="section">
+      <div class="section-head">補綴名</div>
+      <div class="row">
+        <div class="field" style="border-right:none; gap:6px;">
+          <input type="text" placeholder="例：前歯硬質レジン前装冠">
+          <textarea class="hotestu-detail" placeholder="補綴に関する詳細・指示を記入"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 色調指示（シェードボタン） -->
+    <div class="section">
+      <div class="section-head">色調指示（シェード）</div>
+      <div class="shade-grid">
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">A1</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">A2</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">A3</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">A3.5</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">A4</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">B1</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">B2</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">B3</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">B4</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">C1</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">C2</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">C3</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">C4</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">D2</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">D3</button>
+        <button type="button" class="shade-btn" onclick="toggleShade(this)">D4</button>
+      </div>
+    </div>
+
+    <!-- ⑤ 金属 -->
+    <div class="section">
+      <div class="section-head">金属 / 材料</div>
+      <div class="metal-checks">
+        <label class="check-item"><input type="checkbox"> 12%Pd</label>
+        <label class="check-item"><input type="checkbox"> 銀合金</label>
+        <label class="check-item"><input type="checkbox"> チタン</label>
+        <div class="metal-other-wrap">
+          <label class="check-item"><input type="checkbox"> その他：</label>
+          <input type="text" placeholder="材料名">
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 歯式 -->
+    <div class="section">
+      <div class="section-head">歯式</div>
+      <div class="tooth-num-grid">
+        <div class="tooth-arch">
+          <div class="arch-label">上顎</div>
+          <div class="arch-row">
+            <div class="arch-side">
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="8">8</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="7">7</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="6">6</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="5">5</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="4">4</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="3">3</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="2">2</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="1">1</button>
+            </div>
+            <div class="arch-divider"></div>
+            <div class="arch-side">
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="1">1</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="2">2</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="3">3</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="4">4</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="5">5</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="6">6</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="7">7</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="8">8</button>
+            </div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-side">
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="8">8</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="7">7</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="6">6</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="5">5</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="4">4</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="3">3</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="2">2</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="1">1</button>
+            </div>
+            <div class="arch-divider"></div>
+            <div class="arch-side">
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="1">1</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="2">2</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="3">3</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="4">4</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="5">5</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="6">6</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="7">7</button>
+              <button class="tooth-btn" onclick="toggleTooth(this)" data-num="8">8</button>
+            </div>
+          </div>
+          <div class="arch-label">下顎</div>
+        </div>
+      </div>
+      <div class="tooth-note-row">
+        <div class="field" style="border-right:none; padding-left:0; padding-right:0;">
+          <div class="field-label">部位・補足メモ</div>
+          <input type="text">
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ 技工物（縦に詰める） -->
+    <div class="section">
+      <div class="section-head">技工物の種類</div>
+      <div class="gikou-grid">
+
+        <div class="gikou-col">
+          <div class="gikou-col-title">技工物（保険）</div>
+          <div class="gikou-group">
+            <div class="gikou-group-name">CAM/CAM補綴</div>
+            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">インレー小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">インレー大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">クラウン小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">クラウン大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">エンドクラウン</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">PEEK冠（ホワイト）</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">PEEK冠（アイボリー）</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
+          </div>
+        </div>
+
+        <div class="gikou-col">
+          <div class="gikou-col-title">技工物（自費）</div>
+          <div class="gikou-group">
+            <div class="gikou-group-name">フルジルコニア</div>
+            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+          </div>
+          <div class="gikou-group">
+            <div class="gikou-group-name">ジルコニアセラミック</div>
+            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+          </div>
+          <div class="gikou-group">
+            <div class="gikou-group-name">e-max</div>
+            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+          </div>
+          <div class="gikou-group">
+            <div class="gikou-group-name">メタルボンド</div>
+            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ⑧ 特記事項（縦長拡大） -->
+    <div class="section">
+      <div class="section-head">特記事項 / その他</div>
+      <div class="note-full">
+        <div class="note-tab-bar">
+          <button type="button" class="note-tab-btn active" data-pane="note-text" onclick="switchNotePane(this)">⌨ テキスト入力</button>
+          <button type="button" class="note-tab-btn" data-pane="note-draw" onclick="switchNotePane(this)">✏ 手書きメモ</button>
+        </div>
+        <div id="note-text" class="note-pane active">
+          <textarea placeholder="咬合状態、形態の注意点、既往症、特別な指示などを記入してください…"></textarea>
+        </div>
+        <div id="note-draw" class="note-pane">
+          <div class="canvas-toolbar">
+            <button type="button" class="canvas-tool-btn active" id="tool-pen" onclick="setTool('pen')">✏ ペン</button>
+            <button type="button" class="canvas-tool-btn" id="tool-eraser" onclick="setTool('eraser')">⌫ 消しゴム</button>
+            <span class="canvas-color-btn active" data-color="#1a1f2e" style="background:#1a1f2e" onclick="setColor(this)" title="黒"></span>
+            <span class="canvas-color-btn" data-color="#dc2626" style="background:#dc2626" onclick="setColor(this)" title="赤"></span>
+            <span class="canvas-color-btn" data-color="#2563eb" style="background:#2563eb" onclick="setColor(this)" title="青"></span>
+            <span class="canvas-color-btn" data-color="#16a34a" style="background:#16a34a" onclick="setColor(this)" title="緑"></span>
+            <span class="canvas-size-label">太さ</span>
+            <input type="range" min="1" max="20" value="3" class="canvas-size-slider" id="penSize" oninput="updatePenSize(this.value)">
+            <button type="button" class="canvas-tool-btn" onclick="undoCanvas()">↶ 戻す</button>
+            <button type="button" class="canvas-tool-btn danger" onclick="clearCanvas()">🗑 全消去</button>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="drawCanvas" class="draw-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-body -->
+
+  <!-- ファイル名バー -->
+  <div class="filename-bar">
+    <div class="filename-label">📄 PDFファイル名</div>
+    <div class="filename-display" id="filename-display" onclick="copyFilename()" title="タップでコピー">
+      日付_患者名_技工指示書.pdf
+    </div>
+    <div class="filename-hint">
+      ① ファイル名をタップしてコピー → ② 「印刷・PDF保存へ」 → ③ 保存ダイアログでファイル名欄に貼り付け
+    </div>
+  </div>
+
+  <!-- アクションバー -->
+  <div class="action-bar">
+    <button class="btn btn-clear" onclick="clearAll()">リセット</button>
+    <button class="btn btn-print" onclick="printPdf()">🖨 印刷・PDF保存へ</button>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<div class="toast" id="toast">ファイル名をコピーしました</div>
+
+<script>
+// 今日の日付
+(function(){
+  const d = new Date();
+  const str = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+  document.getElementById('today-date').textContent = str;
+  document.getElementById('issue-date').value = d.toISOString().slice(0,10);
+})();
+
+const NUM_TO_CIRCLE = { '1':'①','2':'②','3':'③','4':'④','5':'⑤','6':'⑥','7':'⑦','8':'⑧' };
+const CIRCLE_TO_NUM = { '①':'1','②':'2','③':'3','④':'4','⑤':'5','⑥':'6','⑦':'7','⑧':'8' };
+
+function toggleTooth(btn){
+  const isActive = btn.classList.toggle('active');
+  if(isActive){
+    const n = btn.dataset.num || btn.textContent.trim();
+    if(NUM_TO_CIRCLE[n]) btn.textContent = NUM_TO_CIRCLE[n];
+  } else {
+    const t = btn.textContent.trim();
+    if(CIRCLE_TO_NUM[t]) btn.textContent = CIRCLE_TO_NUM[t];
+    else if(btn.dataset.num) btn.textContent = btn.dataset.num;
+  }
+}
+
+function toggleShade(btn){ btn.classList.toggle('active'); }
+
+function loadFig(input, areaId){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const area = document.getElementById(areaId);
+    let img = area.querySelector('img');
+    if(!img){
+      img = document.createElement('img');
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '70px';
+      img.style.borderRadius = '4px';
+      area.insertBefore(img, area.firstChild);
+    }
+    img.src = e.target.result;
+    img.style.display = 'block';
+    area.querySelectorAll('.figure-icon, .figure-hint-text').forEach(el => el.style.display='none');
+  };
+  reader.readAsDataURL(file);
+}
+
+document.querySelectorAll('.figure-half-area').forEach(area=>{
+  area.addEventListener('click', function(e){
+    if(e.target.tagName === 'INPUT') return;
+    const fi = area.querySelector('input[type="file"]');
+    if(fi) fi.click();
+  });
+});
+
+function switchNotePane(btn){
+  document.querySelectorAll('.note-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const target = btn.dataset.pane;
+  document.querySelectorAll('.note-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById(target).classList.add('active');
+  updateNotePrintFlags();
+  if(target === 'note-draw') setTimeout(resizeCanvas, 50);
+}
+
+// 手書きキャンバス
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, lastX = 0, lastY = 0;
+let currentTool = 'pen', currentColor = '#1a1f2e', currentSize = 3;
+let history = [], historyIndex = -1;
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  if(rect.width === 0) return;
+  const dpr = window.devicePixelRatio || 1;
+  const saved = canvas.toDataURL();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr, dpr);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  if(saved && saved !== 'data:,'){
+    const img = new Image();
+    img.onload = function(){ ctx.drawImage(img, 0, 0, rect.width, rect.height); };
+    img.src = saved;
+  }
+}
+
+function getPos(e){
+  const rect = canvas.getBoundingClientRect();
+  if(e.touches && e.touches[0]) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+function startDraw(e){
+  e.preventDefault();
+  drawing = true;
+  const pos = getPos(e);
+  lastX = pos.x; lastY = pos.y;
+  drawSegment(lastX, lastY, lastX, lastY);
+}
+function draw(e){
+  if(!drawing) return;
+  e.preventDefault();
+  const pos = getPos(e);
+  drawSegment(lastX, lastY, pos.x, pos.y);
+  lastX = pos.x; lastY = pos.y;
+}
+function drawSegment(x1, y1, x2, y2){
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  if(currentTool === 'eraser'){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = currentSize * 4;
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.lineWidth = currentSize;
+    ctx.strokeStyle = currentColor;
+  }
+  ctx.stroke();
+}
+function endDraw(){ if(!drawing) return; drawing = false; saveHistory(); updateNotePrintFlags(); }
+function saveHistory(){
+  history = history.slice(0, historyIndex + 1);
+  history.push(canvas.toDataURL());
+  historyIndex = history.length - 1;
+  if(history.length > 30){ history.shift(); historyIndex--; }
+}
+function undoCanvas(){
+  if(historyIndex <= 0){ clearCanvas(true); return; }
+  historyIndex--;
+  const img = new Image();
+  img.onload = function(){
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.drawImage(img, 0, 0, rect.width, rect.height);
+  };
+  img.src = history[historyIndex];
+  updateNotePrintFlags();
+}
+function clearCanvas(skipConfirm){
+  if(!skipConfirm && !confirm('手書きメモをすべて消去しますか？')) return;
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  history = []; historyIndex = -1;
+  saveHistory();
+  updateNotePrintFlags();
+}
+function setTool(tool){
+  currentTool = tool;
+  document.getElementById('tool-pen').classList.toggle('active', tool === 'pen');
+  document.getElementById('tool-eraser').classList.toggle('active', tool === 'eraser');
+  canvas.style.cursor = tool === 'eraser' ? 'cell' : 'crosshair';
+}
+function setColor(el){
+  currentColor = el.dataset.color;
+  document.querySelectorAll('.canvas-color-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  setTool('pen');
+}
+function updatePenSize(v){ currentSize = parseInt(v, 10); }
+
+function updateNotePrintFlags(){
+  const textPane = document.getElementById('note-text');
+  const drawPane = document.getElementById('note-draw');
+  const ta = textPane.querySelector('textarea');
+  textPane.classList.toggle('has-content', ta && ta.value.trim().length > 0);
+  drawPane.classList.toggle('has-content', historyIndex > 0);
+}
+
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+canvas.addEventListener('touchstart', startDraw, { passive: false });
+canvas.addEventListener('touchmove', draw, { passive: false });
+canvas.addEventListener('touchend', endDraw);
+canvas.addEventListener('touchcancel', endDraw);
+
+document.querySelector('#note-text textarea').addEventListener('input', updateNotePrintFlags);
+
+// ファイル名生成（日付_患者名_技工指示書.pdf）
+function buildFilename(){
+  const dRaw = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
+  const dateStr = dRaw.replace(/-/g, '');
+  const name = (document.getElementById('patient-name').value || '患者名').trim().replace(/[\\/:*?"<>|]/g, '');
+  return `${dateStr}_${name}_技工指示書.pdf`;
+}
+function updateFilenameDisplay(){
+  document.getElementById('filename-display').textContent = buildFilename();
+}
+document.getElementById('patient-name').addEventListener('input', updateFilenameDisplay);
+document.getElementById('issue-date').addEventListener('change', updateFilenameDisplay);
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+async function copyFilename(){
+  const name = buildFilename();
+  const display = document.getElementById('filename-display');
+  let copied = false;
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(name);
+      copied = true;
+    }
+  } catch(e){}
+  if(!copied){
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = name;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copied = true;
+    } catch(e){}
+  }
+  if(copied){
+    display.classList.add('copied');
+    showToast('✓ ファイル名をコピーしました');
+    setTimeout(() => display.classList.remove('copied'), 2000);
+  } else {
+    showToast('コピーに失敗しました。長押しで選択してください');
+  }
+}
+
+function printPdf(){
+  const original = document.title;
+  const fname = buildFilename().replace(/\.pdf$/, '');
+  document.title = fname;
+  updateNotePrintFlags();
+  const restore = () => { document.title = original; window.removeEventListener('afterprint', restore); };
+  window.addEventListener('afterprint', restore);
+  setTimeout(() => window.print(), 60);
+}
+
+window.addEventListener('load', function(){
+  resizeCanvas();
+  saveHistory();
+  updateNotePrintFlags();
+  updateFilenameDisplay();
+});
+window.addEventListener('resize', function(){
+  if(document.getElementById('note-draw').classList.contains('active')) resizeCanvas();
+});
+window.addEventListener('beforeprint', updateNotePrintFlags);
+
+function clearAll(){
+  if(!confirm('入力内容をすべてリセットしますか？')) return;
+  document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(el=>{
+    if(el.id !== 'issue-date') el.value = '';
+  });
+  document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el=> el.checked=false);
+  document.querySelectorAll('.tooth-btn').forEach(btn=>{
+    btn.classList.remove('active');
+    if(btn.dataset.num) btn.textContent = btn.dataset.num;
+  });
+  document.querySelectorAll('.shade-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.figure-half-area img').forEach(img=>{ img.src=''; img.style.display='none'; });
+  document.querySelectorAll('.figure-icon, .figure-hint-text').forEach(el=> el.style.display='');
+  clearCanvas(true);
+  document.getElementById('issue-date').value = new Date().toISOString().slice(0,10);
+  updateNotePrintFlags();
+  updateFilenameDisplay();
+}
+</script>
+
+<!-- ===== PWA: Service Worker 登録 ===== -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      // 新しいバージョンが見つかったら自動で更新
+      reg.addEventListener('updatefound', function () {
+        var newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', function () {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // 既に旧SWがコントロール中 → 次回起動時に新SWに切替（ユーザーには通知しない方針）
+            // 即時切替したい場合は newWorker.postMessage({type:'SKIP_WAITING'}) を呼ぶ
+          }
+        });
+      });
+    }).catch(function (err) {
+      console.warn('Service Worker registration failed:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
