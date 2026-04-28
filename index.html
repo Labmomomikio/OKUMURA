@@ -500,6 +500,31 @@ body {
 .btn-clear { background: var(--white); color: var(--text-mid); border: 1.5px solid var(--line); }
 .btn:hover { opacity: 0.85; }
 
+/* 今日ボタン */
+.date-with-today {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.date-with-today input[type="date"] { flex: 1; }
+.today-btn {
+  padding: 0 12px;
+  height: 40px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.12s;
+}
+.today-btn:hover { opacity: 0.85; }
+.today-btn:active { transform: scale(0.95); }
+
 /* ===== スロットナビゲーター ===== */
 .slot-nav {
   display: flex;
@@ -691,6 +716,8 @@ body {
   .toast,
   .note-tab-bar,
   .canvas-toolbar,
+  .today-btn,
+  .slot-nav,
   .figure-half-area input[type="file"],
   .figure-icon,
   .figure-hint-text { display: none !important; }
@@ -969,7 +996,10 @@ body {
         </div>
         <div class="field">
           <div class="field-label">発行日</div>
-          <input type="date" id="issue-date">
+          <div class="date-with-today">
+            <input type="date" id="issue-date">
+            <button type="button" class="today-btn" onclick="setToday()">今日</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1750,6 +1780,12 @@ canvas.addEventListener('touchend', endDraw);
 canvas.addEventListener('touchcancel', endDraw);
 
 document.querySelector('#note-text textarea').addEventListener('input', updateNotePrintFlags);
+
+// 今日ボタン
+function setToday(){
+  document.getElementById('issue-date').value = new Date().toISOString().slice(0,10);
+  updateFilenameDisplay();
+}
 
 // ===== ファイル名 =====
 function buildFilename(){
