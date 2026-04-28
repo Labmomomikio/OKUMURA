@@ -500,6 +500,153 @@ body {
 .btn-clear { background: var(--white); color: var(--text-mid); border: 1.5px solid var(--line); }
 .btn:hover { opacity: 0.85; }
 
+/* ===== スロットナビゲーター ===== */
+.slot-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--navy);
+  padding: 8px 14px;
+  gap: 10px;
+  border-bottom: 2px solid var(--navy-mid);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.slot-nav-arrow {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.slot-nav-arrow:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.6); }
+.slot-nav-arrow:active { background: rgba(255,255,255,0.35); transform: scale(0.93); }
+.slot-nav-arrow:disabled { opacity: 0.3; cursor: default; }
+.slot-nav-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.slot-nav-label {
+  color: rgba(255,255,255,0.6);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+.slot-nav-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.slot-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.slot-dot.active {
+  background: #fff;
+  transform: scale(1.25);
+}
+.slot-dot:hover { background: rgba(255,255,255,0.6); }
+.slot-nav-info {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-align: center;
+}
+.slot-saved-badge {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+  text-align: center;
+  min-height: 14px;
+  letter-spacing: 0.04em;
+}
+.slot-saved-badge.saved { color: #86efac; }
+
+/* スロット操作ボタン（保存・クリア） */
+.slot-action-btns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.slot-btn {
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-size: 12px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 0.04em;
+  min-height: 38px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.12s;
+}
+.slot-btn:active { transform: scale(0.95); }
+.slot-btn-save {
+  background: #16a34a;
+  color: #fff;
+}
+.slot-btn-save:hover { opacity: 0.88; }
+.slot-btn-clear {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.88);
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+.slot-btn-clear:hover { background: rgba(220,38,38,0.35); border-color: #f87171; color: #fff; }
+
+.slot-btn-add {
+  background: rgba(37,99,235,0.85);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+.slot-btn-add:hover { background: #2563eb; }
+.slot-btn-delete {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+.slot-btn-delete:hover { background: rgba(220,38,38,0.5); color: #fff; border-color: #f87171; }
+.slot-btn-delete:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+
+/* スロットドット：10枚超えたら非表示 */
+.slot-nav-dots.many { display: none; }
+
+/* スワイプアニメーション */
+.form-body {
+  overflow: hidden;
+  position: relative;
+}
+.form-body-inner {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s;
+}
+.form-body-inner.slide-left {
+  transform: translateX(-40px);
+  opacity: 0;
+}
+.form-body-inner.slide-right {
+  transform: translateX(40px);
+  opacity: 0;
+}
+
 /* トースト */
 .toast {
   position: fixed;
@@ -793,7 +940,26 @@ body {
     <div class="header-sub" id="today-date"></div>
   </div>
 
+  <!-- ===== スロットナビゲーター ===== -->
+  <div class="slot-nav" id="slotNav">
+    <button class="slot-nav-arrow" id="slotPrev" onclick="changeSlot(-1)" title="前のカルテ">&#8592;</button>
+    <div class="slot-nav-center">
+      <div class="slot-nav-label">カルテ番号</div>
+      <div class="slot-nav-dots" id="slotDots"></div>
+      <div class="slot-nav-info" id="slotInfo">1 / 5</div>
+      <div class="slot-saved-badge" id="slotSavedBadge"></div>
+    </div>
+    <div class="slot-action-btns">
+      <button class="slot-btn slot-btn-delete" onclick="deleteCurrentSlot()" id="slotDeleteBtn" title="このカルテを削除">🗑</button>
+      <button class="slot-btn slot-btn-clear" onclick="clearCurrentSlot()">クリア</button>
+      <button class="slot-btn slot-btn-save" onclick="saveCurrentSlot()">💾 保存</button>
+      <button class="slot-btn slot-btn-add" onclick="addNewSlot()" title="新規カルテを追加">＋ 新規</button>
+    </div>
+    <button class="slot-nav-arrow" id="slotNext" onclick="changeSlot(1)" title="次のカルテ">&#8594;</button>
+  </div>
+
   <div class="form-body">
+  <div class="form-body-inner" id="formBodyInner">
 
     <!-- ① 基本情報 -->
     <div class="section">
@@ -1037,6 +1203,7 @@ body {
       </div>
     </div>
 
+  </div><!-- /form-body-inner -->
   </div><!-- /form-body -->
 
   <!-- ファイル名バー -->
@@ -1046,13 +1213,12 @@ body {
       日付_患者名_技工指示書.pdf
     </div>
     <div class="filename-hint">
-      ① ファイル名をタップしてコピー → ② 「印刷・PDF保存へ」 → ③ 保存ダイアログでファイル名欄に貼り付け
+      「印刷・PDF保存へ」を押すと自動でファイル名がコピーされます → 保存ダイアログでそのまま貼り付け
     </div>
   </div>
 
   <!-- アクションバー -->
   <div class="action-bar">
-    <button class="btn btn-clear" onclick="clearAll()">リセット</button>
     <button class="btn btn-print" onclick="printPdf()">🖨 印刷・PDF保存へ</button>
   </div>
 
@@ -1061,17 +1227,360 @@ body {
 <div class="toast" id="toast">ファイル名をコピーしました</div>
 
 <script>
-// 今日の日付
-(function(){
-  const d = new Date();
-  const str = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
-  document.getElementById('today-date').textContent = str;
-  document.getElementById('issue-date').value = d.toISOString().slice(0,10);
-})();
-
+// ===== 定数 =====
+const STORAGE_KEY = 'okumura_slots';
+const CURRENT_SLOT_KEY = 'okumura_current_slot';
+const DEFAULT_SLOTS = 5;
 const NUM_TO_CIRCLE = { '1':'①','2':'②','3':'③','4':'④','5':'⑤','6':'⑥','7':'⑦','8':'⑧' };
 const CIRCLE_TO_NUM = { '①':'1','②':'2','③':'3','④':'4','⑤':'5','⑥':'6','⑦':'7','⑧':'8' };
 
+// ===== スロット管理 =====
+let currentSlot = 0;
+let slots = [];
+let savedTimes = [];
+
+function emptySlot(){
+  return {
+    clinicName:'', issueDate: new Date().toISOString().slice(0,10),
+    patientName:'', fitDate:'', gender:'', age:'', trialDate:'',
+    prothesisName:'', prothesisDetail:'',
+    shades:[],
+    metalPd: false, metalGin: false, metalTi: false, metalOther: false, metalOtherText:'',
+    teeth:[], toothNote:'',
+    gikouChecks:{},
+    noteText:'', noteCanvas: null,
+  };
+}
+
+function initSlots(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    slots = raw ? JSON.parse(raw) : [];
+    const rawTimes = localStorage.getItem(STORAGE_KEY+'_times');
+    savedTimes = rawTimes ? JSON.parse(rawTimes) : [];
+  } catch(e){ slots = []; savedTimes = []; }
+  if(slots.length < DEFAULT_SLOTS){
+    while(slots.length < DEFAULT_SLOTS) slots.push(emptySlot());
+  }
+  while(savedTimes.length < slots.length) savedTimes.push(null);
+  try { currentSlot = parseInt(localStorage.getItem(CURRENT_SLOT_KEY))||0; } catch(e){ currentSlot=0; }
+  if(currentSlot < 0 || currentSlot >= slots.length) currentSlot = 0;
+}
+
+function saveSlots(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(slots)); } catch(e){}
+  try { localStorage.setItem(CURRENT_SLOT_KEY, currentSlot); } catch(e){}
+}
+
+function saveTimes(){
+  try { localStorage.setItem(STORAGE_KEY+'_times', JSON.stringify(savedTimes)); } catch(e){}
+}
+
+// ===== フォーム → データ =====
+function collectFormData(){
+  const get = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const inputs = document.querySelectorAll('.form-body-inner input[type="text"]:not(.canvas-size-slider)');
+  const dates  = document.querySelectorAll('.form-body-inner input[type="date"]');
+  const genderEl = document.querySelector('.form-body-inner input[name="gender"]:checked');
+
+  const d = emptySlot();
+  d.clinicName     = inputs[0]?.value||'';
+  d.issueDate      = dates[0]?.value||'';
+  d.patientName    = inputs[1]?.value||'';
+  d.fitDate        = dates[1]?.value||'';
+  d.gender         = genderEl?.value||'';
+  d.age            = inputs[2]?.value||'';
+  d.trialDate      = dates[2]?.value||'';
+  d.prothesisName  = inputs[3]?.value||'';
+  d.prothesisDetail= document.querySelector('.hotestu-detail')?.value||'';
+  d.shades = [...document.querySelectorAll('.shade-btn.active')].map(b=>b.textContent.trim());
+
+  const cbs = document.querySelectorAll('.metal-checks input[type="checkbox"]');
+  d.metalPd    = cbs[0]?.checked||false;
+  d.metalGin   = cbs[1]?.checked||false;
+  d.metalTi    = cbs[2]?.checked||false;
+  d.metalOther = cbs[3]?.checked||false;
+  d.metalOtherText = inputs[4]?.value||'';
+
+  d.teeth = [...document.querySelectorAll('.tooth-btn.active')].map(b=>{
+    const row = [...b.closest('.arch-side').children].indexOf(b);
+    const isUpper = b.closest('.tooth-arch').querySelectorAll('.arch-row')[0].contains(b);
+    const isLeft  = b.closest('.arch-row').querySelector('.arch-side') === b.closest('.arch-side');
+    return { num: b.dataset.num, text: b.textContent.trim(), isUpper, isLeft, idx: row };
+  });
+  d.toothNote = inputs[5]?.value||'';
+
+  // 技工物チェックボックス
+  d.gikouChecks = {};
+  document.querySelectorAll('.gikou-check input[type="checkbox"]').forEach((cb,i)=>{
+    d.gikouChecks['g'+i] = cb.checked;
+  });
+
+  d.noteText = document.querySelector('#note-text textarea')?.value||'';
+  d.noteCanvas = canvas.toDataURL();
+  return d;
+}
+
+// ===== データ → フォーム =====
+function applyFormData(d){
+  if(!d) d = emptySlot();
+
+  const inputs = document.querySelectorAll('.form-body-inner input[type="text"]:not(.canvas-size-slider)');
+  const dates  = document.querySelectorAll('.form-body-inner input[type="date"]');
+
+  if(inputs[0]) inputs[0].value = d.clinicName||'';
+  if(dates[0])  dates[0].value  = d.issueDate||new Date().toISOString().slice(0,10);
+  if(inputs[1]) inputs[1].value = d.patientName||'';
+  if(dates[1])  dates[1].value  = d.fitDate||'';
+  // gender
+  document.querySelectorAll('.form-body-inner input[name="gender"]').forEach(r=>{ r.checked = r.value===d.gender; });
+  if(inputs[2]) inputs[2].value = d.age||'';
+  if(dates[2])  dates[2].value  = d.trialDate||'';
+  if(inputs[3]) inputs[3].value = d.prothesisName||'';
+  const hd = document.querySelector('.hotestu-detail');
+  if(hd) hd.value = d.prothesisDetail||'';
+
+  // シェード
+  document.querySelectorAll('.shade-btn').forEach(b=>{
+    b.classList.toggle('active', (d.shades||[]).includes(b.textContent.trim()));
+  });
+
+  // 金属
+  const cbs = document.querySelectorAll('.metal-checks input[type="checkbox"]');
+  if(cbs[0]) cbs[0].checked = d.metalPd||false;
+  if(cbs[1]) cbs[1].checked = d.metalGin||false;
+  if(cbs[2]) cbs[2].checked = d.metalTi||false;
+  if(cbs[3]) cbs[3].checked = d.metalOther||false;
+  if(inputs[4]) inputs[4].value = d.metalOtherText||'';
+
+  // 歯式リセット
+  document.querySelectorAll('.tooth-btn').forEach(btn=>{
+    btn.classList.remove('active');
+    if(btn.dataset.num) btn.textContent = btn.dataset.num;
+  });
+  // 歯式復元 — activeになっている歯をdata-numとposition両方で照合
+  if(d.teeth && d.teeth.length){
+    const allToothBtns = [...document.querySelectorAll('.tooth-btn')];
+    const archRows = document.querySelectorAll('.tooth-arch .arch-row');
+    // シンプルに: saved textをそのままsearchして一致するbtnをactive化
+    d.teeth.forEach(t=>{
+      const match = allToothBtns.find(b=>{
+        const inUpper = archRows[0]&&archRows[0].contains(b);
+        const side = b.closest('.arch-side');
+        const sides = [...b.closest('.arch-row').querySelectorAll('.arch-side')];
+        const isLeft = sides.indexOf(side)===0;
+        return b.dataset.num===t.num && inUpper===t.isUpper && isLeft===t.isLeft && [...side.children].indexOf(b)===t.idx;
+      });
+      if(match){
+        match.classList.add('active');
+        if(t.num && NUM_TO_CIRCLE[t.num]) match.textContent = NUM_TO_CIRCLE[t.num];
+      }
+    });
+  }
+  if(inputs[5]) inputs[5].value = d.toothNote||'';
+
+  // 技工物チェック
+  document.querySelectorAll('.gikou-check input[type="checkbox"]').forEach((cb,i)=>{
+    cb.checked = (d.gikouChecks&&d.gikouChecks['g'+i])||false;
+  });
+
+  // 特記事項テキスト
+  const ntTextarea = document.querySelector('#note-text textarea');
+  if(ntTextarea) ntTextarea.value = d.noteText||'';
+
+  // キャンバス復元
+  history=[]; historyIndex=-1;
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if(d.noteCanvas && d.noteCanvas !== 'data:,' && d.noteCanvas.startsWith('data:image')){
+    const img = new Image();
+    img.onload = function(){
+      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      saveHistory();
+    };
+    img.src = d.noteCanvas;
+  } else {
+    saveHistory();
+  }
+
+  updateNotePrintFlags();
+  updateFilenameDisplay();
+  document.getElementById('issue-date') && updateFilenameDisplay();
+}
+
+// ===== スロットUI更新 =====
+function updateSlotUI(){
+  const total = slots.length;
+  document.getElementById('slotInfo').textContent = `${currentSlot+1} / ${total}`;
+  document.getElementById('slotPrev').disabled = currentSlot === 0;
+  document.getElementById('slotNext').disabled = currentSlot === total-1;
+
+  // 削除ボタン：1枚のみの時は無効
+  const delBtn = document.getElementById('slotDeleteBtn');
+  delBtn.disabled = total <= 1;
+
+  // ドット：10枚以下なら表示、超えたら数字のみ
+  const dotsEl = document.getElementById('slotDots');
+  dotsEl.innerHTML = '';
+  if(total <= 10){
+    dotsEl.classList.remove('many');
+    for(let i=0;i<total;i++){
+      const dot = document.createElement('button');
+      dot.className = 'slot-dot' + (i===currentSlot?' active':'');
+      dot.title = `カルテ${i+1}`;
+      dot.onclick = ()=>{ if(i!==currentSlot) goToSlot(i); };
+      dotsEl.appendChild(dot);
+    }
+  } else {
+    dotsEl.classList.add('many');
+  }
+
+  // 保存時刻バッジ
+  const badge = document.getElementById('slotSavedBadge');
+  const t = savedTimes[currentSlot];
+  if(t){
+    badge.textContent = `✓ 保存済 ${t}`;
+    badge.className = 'slot-saved-badge saved';
+  } else {
+    badge.textContent = '未保存';
+    badge.className = 'slot-saved-badge';
+  }
+
+  localStorage.setItem(CURRENT_SLOT_KEY, currentSlot);
+}
+
+// ===== スロット切り替え =====
+function goToSlot(idx, dir){
+  // 現在スロットを自動保存
+  slots[currentSlot] = collectFormData();
+  saveSlots();
+
+  const direction = dir !== undefined ? dir : (idx > currentSlot ? 1 : -1);
+  const inner = document.getElementById('formBodyInner');
+
+  inner.classList.add(direction > 0 ? 'slide-left' : 'slide-right');
+
+  setTimeout(()=>{
+    currentSlot = idx;
+    applyFormData(slots[currentSlot]);
+    updateSlotUI();
+
+    inner.classList.remove('slide-left','slide-right');
+    inner.style.transition = 'none';
+    inner.style.transform = direction>0?'translateX(40px)':'translateX(-40px)';
+    inner.style.opacity = '0';
+
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        inner.style.transition = '';
+        inner.style.transform = '';
+        inner.style.opacity = '';
+      });
+    });
+  }, 220);
+}
+
+function changeSlot(delta){
+  const next = currentSlot + delta;
+  if(next < 0 || next >= slots.length) return;
+  goToSlot(next, delta);
+}
+
+// ===== 新規追加 =====
+function addNewSlot(){
+  // 現在スロットを自動保存
+  slots[currentSlot] = collectFormData();
+  saveSlots();
+
+  slots.push(emptySlot());
+  savedTimes.push(null);
+  saveTimes();
+  saveSlots();
+
+  const newIdx = slots.length - 1;
+  const inner = document.getElementById('formBodyInner');
+  inner.classList.add('slide-left');
+  setTimeout(()=>{
+    currentSlot = newIdx;
+    applyFormData(slots[currentSlot]);
+    updateSlotUI();
+    inner.classList.remove('slide-left');
+    inner.style.transition = 'none';
+    inner.style.transform = 'translateX(40px)';
+    inner.style.opacity = '0';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      inner.style.transition = '';
+      inner.style.transform = '';
+      inner.style.opacity = '';
+    }));
+  }, 220);
+  showToast(`📋 カルテ${slots.length}を追加しました`);
+}
+
+// ===== 削除 =====
+function deleteCurrentSlot(){
+  if(slots.length <= 1){ showToast('カルテは最低1枚必要です','#dc2626'); return; }
+  const name = slots[currentSlot].patientName || `カルテ${currentSlot+1}`;
+  if(!confirm(`「${name}」を削除しますか？\nこの操作は元に戻せません。`)) return;
+
+  slots.splice(currentSlot, 1);
+  savedTimes.splice(currentSlot, 1);
+  saveSlots();
+  saveTimes();
+
+  if(currentSlot >= slots.length) currentSlot = slots.length - 1;
+  applyFormData(slots[currentSlot]);
+  updateSlotUI();
+  showToast('🗑 削除しました','#dc2626');
+}
+
+// ===== 保存ボタン =====
+function saveCurrentSlot(){
+  slots[currentSlot] = collectFormData();
+  saveSlots();
+  const now = new Date();
+  savedTimes[currentSlot] = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  saveTimes();
+  updateSlotUI();
+  showToast(`💾 カルテ${currentSlot+1}を保存しました`);
+}
+
+// ===== クリアボタン =====
+function clearCurrentSlot(){
+  if(!confirm(`カルテ${currentSlot+1}の入力内容をクリアしますか？`)) return;
+  slots[currentSlot] = emptySlot();
+  savedTimes[currentSlot] = null;
+  saveSlots();
+  saveTimes();
+  applyFormData(slots[currentSlot]);
+  updateSlotUI();
+  showToast(`🗑 カルテ${currentSlot+1}をクリアしました`);
+}
+
+// ===== スワイプ =====
+(function initSwipe(){
+  let startX = 0, startY = 0, moved = false;
+  const el = document.getElementById('formBodyInner');
+  el.addEventListener('touchstart', e=>{
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, {passive:true});
+  el.addEventListener('touchmove', e=>{
+    moved = true;
+  }, {passive:true});
+  el.addEventListener('touchend', e=>{
+    if(!moved) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if(Math.abs(dx) > Math.abs(dy)*1.5 && Math.abs(dx) > 50){
+      if(dx < 0) changeSlot(1);
+      else changeSlot(-1);
+    }
+  }, {passive:true});
+})();
+
+// ===== 歯式ボタン =====
 function toggleTooth(btn){
   const isActive = btn.classList.toggle('active');
   if(isActive){
@@ -1125,7 +1634,7 @@ function switchNotePane(btn){
   if(target === 'note-draw') setTimeout(resizeCanvas, 50);
 }
 
-// 手書きキャンバス
+// ===== 手書きキャンバス =====
 const canvas = document.getElementById('drawCanvas');
 const ctx = canvas.getContext('2d');
 let drawing = false, lastX = 0, lastY = 0;
@@ -1207,7 +1716,7 @@ function undoCanvas(){
 function clearCanvas(skipConfirm){
   if(!skipConfirm && !confirm('手書きメモをすべて消去しますか？')) return;
   const rect = canvas.getBoundingClientRect();
-  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   history = []; historyIndex = -1;
   saveHistory();
   updateNotePrintFlags();
@@ -1245,7 +1754,7 @@ canvas.addEventListener('touchcancel', endDraw);
 
 document.querySelector('#note-text textarea').addEventListener('input', updateNotePrintFlags);
 
-// ファイル名生成（日付_患者名_技工指示書.pdf）
+// ===== ファイル名 =====
 function buildFilename(){
   const dRaw = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
   const dateStr = dRaw.replace(/-/g, '');
@@ -1253,16 +1762,18 @@ function buildFilename(){
   return `${dateStr}_${name}_技工指示書.pdf`;
 }
 function updateFilenameDisplay(){
-  document.getElementById('filename-display').textContent = buildFilename();
+  const el = document.getElementById('filename-display');
+  if(el) el.textContent = buildFilename();
 }
 document.getElementById('patient-name').addEventListener('input', updateFilenameDisplay);
 document.getElementById('issue-date').addEventListener('change', updateFilenameDisplay);
 
-function showToast(msg){
+function showToast(msg, color){
   const t = document.getElementById('toast');
   t.textContent = msg;
+  t.style.background = color||'#16a34a';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 async function copyFilename(){
@@ -1292,49 +1803,68 @@ async function copyFilename(){
     showToast('✓ ファイル名をコピーしました');
     setTimeout(() => display.classList.remove('copied'), 2000);
   } else {
-    showToast('コピーに失敗しました。長押しで選択してください');
+    showToast('コピーに失敗しました。長押しで選択してください','#dc2626');
   }
 }
 
-function printPdf(){
+async function printPdf(){
   const original = document.title;
   const fname = buildFilename().replace(/\.pdf$/, '');
   document.title = fname;
   updateNotePrintFlags();
+
+  const name = buildFilename();
+  const display = document.getElementById('filename-display');
+  let copied = false;
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(name);
+      copied = true;
+    }
+  } catch(e){}
+  if(!copied){
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = name;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copied = true;
+    } catch(e){}
+  }
+  if(copied){
+    display.classList.add('copied');
+    showToast('✓ ファイル名をコピーしました　→　印刷ダイアログで貼り付けてください');
+    setTimeout(() => display.classList.remove('copied'), 3000);
+  }
+
   const restore = () => { document.title = original; window.removeEventListener('afterprint', restore); };
   window.addEventListener('afterprint', restore);
-  setTimeout(() => window.print(), 60);
+  setTimeout(() => window.print(), 80);
 }
 
+// ===== 今日の日付 =====
+(function(){
+  const d = new Date();
+  const str = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+  document.getElementById('today-date').textContent = str;
+})();
+
+// ===== 初期化 =====
 window.addEventListener('load', function(){
+  initSlots();
   resizeCanvas();
-  saveHistory();
-  updateNotePrintFlags();
-  updateFilenameDisplay();
+  applyFormData(slots[currentSlot]);
+  updateSlotUI();
+  setTimeout(()=>{ resizeCanvas(); saveHistory(); }, 100);
 });
+
 window.addEventListener('resize', function(){
   if(document.getElementById('note-draw').classList.contains('active')) resizeCanvas();
 });
 window.addEventListener('beforeprint', updateNotePrintFlags);
-
-function clearAll(){
-  if(!confirm('入力内容をすべてリセットしますか？')) return;
-  document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(el=>{
-    if(el.id !== 'issue-date') el.value = '';
-  });
-  document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el=> el.checked=false);
-  document.querySelectorAll('.tooth-btn').forEach(btn=>{
-    btn.classList.remove('active');
-    if(btn.dataset.num) btn.textContent = btn.dataset.num;
-  });
-  document.querySelectorAll('.shade-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.figure-half-area img').forEach(img=>{ img.src=''; img.style.display='none'; });
-  document.querySelectorAll('.figure-icon, .figure-hint-text').forEach(el=> el.style.display='');
-  clearCanvas(true);
-  document.getElementById('issue-date').value = new Date().toISOString().slice(0,10);
-  updateNotePrintFlags();
-  updateFilenameDisplay();
-}
 </script>
 
 <!-- ===== PWA: Service Worker 登録 ===== -->
