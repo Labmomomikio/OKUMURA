@@ -516,178 +516,231 @@ body {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ===== PRINT (A4 1ページ最適化) ===== */
+/* ===== PRINT (A4 1ページ厳密最適化) ===== */
 @media print {
-  html, body {
+  /* --- ページ設定: A4 余白最小化 --- */
+  @page {
+    size: A4 portrait;
+    margin: 5mm 5mm 5mm 5mm;
+  }
+
+  html {
+    font-size: 7.5px !important;
+    height: auto !important;
+  }
+  body {
     background: #fff !important;
-    padding: 0 !important; margin: 0 !important;
-    font-size: 8.5px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     color-adjust: exact;
+    line-height: 1.3 !important;
   }
+
+  /* 非表示要素（ボタン類・ファイル名バー） */
+  .action-bar,
+  .filename-bar,
+  .toast,
+  .note-tab-bar,
+  .canvas-toolbar,
+  .figure-half-area input[type="file"],
+  .figure-icon,
+  .figure-hint-text { display: none !important; }
+
+  /* フォーム全体 */
   .form-wrap {
     max-width: 100% !important;
+    width: 100% !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    border: none !important;
+    border: 1px solid #bbb !important;
   }
-  .action-bar, .filename-bar, .toast { display: none !important; }
 
+  /* ヘッダー */
   .form-header {
     background: #fff !important;
     border-bottom: 1.5px solid #1b2b4b !important;
-    padding: 4px 10px !important;
+    padding: 3px 8px !important;
+    gap: 8px !important;
   }
-  .form-header h1 { color: #1b2b4b !important; font-size: 13px !important; letter-spacing: 0.15em !important; }
-  .header-sub { color: #666 !important; font-size: 8px !important; }
+  .form-header h1 {
+    color: #1b2b4b !important;
+    font-size: 11px !important;
+    letter-spacing: 0.12em !important;
+  }
+  .header-sub { color: #666 !important; font-size: 7px !important; }
 
-  /* 技工所ブランド（印刷） */
   .lab-brand {
     border-color: #ccc !important;
-    padding: 0 12px !important;
+    padding: 0 8px !important;
   }
-  .lab-brand-tag {
-    color: #888 !important;
-    font-size: 6.5px !important;
-    margin-bottom: 1px !important;
-  }
+  .lab-brand-tag { color: #888 !important; font-size: 6px !important; margin-bottom: 0 !important; }
   .lab-brand-en {
     color: #1b2b4b !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     text-shadow: none !important;
-    letter-spacing: 0.16em !important;
+    letter-spacing: 0.14em !important;
   }
-  .lab-brand-jp {
-    color: #1b2b4b !important;
-    font-size: 8px !important;
-    margin-top: 1px !important;
-  }
+  .lab-brand-jp { color: #1b2b4b !important; font-size: 7px !important; margin-top: 0 !important; }
 
-  .section { page-break-inside: avoid; }
+  /* セクション共通 */
+  .section { page-break-inside: avoid; border-bottom: 1px solid #ccc !important; }
+  .section:last-child { border-bottom: none !important; }
   .section-head {
     background: #e8eef8 !important;
     color: #1b2b4b !important;
-    font-size: 8.5px !important;
-    padding: 2px 8px !important;
+    font-size: 7.5px !important;
+    font-weight: 700 !important;
+    padding: 1.5px 7px !important;
     page-break-after: avoid;
+    letter-spacing: 0.08em !important;
   }
 
-  .field { padding: 3px 8px !important; gap: 2px !important; }
-  .field-label { font-size: 8px !important; }
-  .field input, .field textarea {
+  /* フィールド */
+  .field { padding: 2px 7px !important; gap: 1px !important; }
+  .field-label { font-size: 7px !important; }
+  .field input[type="text"],
+  .field input[type="date"],
+  .field textarea {
     border: none !important;
-    border-bottom: 1px solid #aaa !important;
+    border-bottom: 0.75px solid #aaa !important;
     background: transparent !important;
     border-radius: 0 !important;
-    padding: 2px 2px !important;
-    font-size: 9px !important;
-    min-height: auto !important;
+    padding: 1px 2px !important;
+    font-size: 8px !important;
+    min-height: unset !important;
+    height: auto !important;
+    line-height: 1.3 !important;
   }
+
+  /* 性別・年齢 */
   .gender-radio {
-    border: 1px solid #aaa !important;
+    border: 0.75px solid #aaa !important;
     background: #fff !important;
-    padding: 1px 6px !important;
-    min-height: auto !important;
-    font-size: 8.5px !important;
+    padding: 0 5px !important;
+    min-height: unset !important;
+    font-size: 7.5px !important;
+    line-height: 1.5 !important;
   }
   .gender-radio:has(input:checked) {
     background: #1b2b4b !important; color: #fff !important; border-color: #1b2b4b !important;
   }
-  .gender-radio input[type="radio"] { width: 9px !important; height: 9px !important; }
-  .gender-age input[type="text"] { width: 36px !important; }
+  .gender-radio input[type="radio"] { width: 8px !important; height: 8px !important; }
+  .gender-age { gap: 4px !important; }
+  .gender-age input[type="text"] { width: 30px !important; }
+  .gender-age span { font-size: 7.5px !important; }
 
+  /* シェード */
   .shade-grid {
-    padding: 3px 8px 4px !important;
+    padding: 2px 7px 3px !important;
     grid-template-columns: repeat(8, 1fr) !important;
     gap: 2px !important;
   }
   .shade-btn {
-    padding: 1px 1px !important;
-    min-height: 16px !important;
-    font-size: 8px !important;
-    border: 1px solid #ddd !important;
+    padding: 0 !important;
+    min-height: 14px !important;
+    font-size: 7px !important;
+    border: 0.75px solid #ddd !important;
     color: #bbb !important;
+    line-height: 14px !important;
   }
   .shade-btn.active {
     background: #1b2b4b !important; color: #fff !important; border-color: #1b2b4b !important;
   }
 
+  /* 補綴の図エリア */
   .figure-half-area {
     border-color: #aaa !important;
     background: #fafafa !important;
-    min-height: 50px !important;
-    margin-top: 3px !important;
+    min-height: 38px !important;
+    margin-top: 2px !important;
   }
-  .figure-half-area input[type="file"] { display: none !important; }
-  .figure-icon { display: none !important; }
-  .figure-half-area > div:not(.figure-icon) { display: none !important; }
-  .figure-half-area img { max-height: 50px !important; display: block !important; }
+  .figure-half-area > div { display: none !important; }
+  .figure-half-area img {
+    max-height: 38px !important;
+    display: block !important;
+  }
 
-  /* 補綴名 詳細テキストエリア（印刷） */
+  /* 補綴名詳細 */
   .hotestu-detail {
     border: none !important;
-    border-bottom: 1px solid #aaa !important;
+    border-bottom: 0.75px solid #aaa !important;
     background: transparent !important;
     border-radius: 0 !important;
-    padding: 3px 4px !important;
-    font-size: 9px !important;
-    min-height: 36px !important;
-    line-height: 1.4 !important;
+    padding: 1px 3px !important;
+    font-size: 8px !important;
+    min-height: unset !important;
+    height: auto !important;
+    line-height: 1.35 !important;
+    resize: none !important;
   }
 
-  .tooth-num-grid { padding: 3px 8px 4px !important; }
+  /* 歯式 */
+  .tooth-num-grid { padding: 2px 7px 3px !important; }
   .tooth-arch { gap: 1px !important; }
-  .arch-label { font-size: 7px !important; margin: 0 !important; }
-  .arch-row, .arch-side { gap: 2px !important; }
+  .arch-label { font-size: 6.5px !important; margin: 0 !important; }
+  .arch-row, .arch-side { gap: 1.5px !important; }
+  .arch-divider { margin: 0 3px !important; }
   .tooth-btn {
-    border: 1px solid #aaa !important;
-    width: 20px !important; height: 20px !important;
-    font-size: 9px !important;
+    border: 0.75px solid #aaa !important;
+    width: 17px !important; height: 17px !important;
+    font-size: 7.5px !important;
     background: #fff !important; color: #444 !important;
+    border-radius: 3px !important;
   }
   .tooth-btn.active {
     background: #1b2b4b !important; color: #fff !important;
-    border-color: #1b2b4b !important; font-size: 10px !important;
+    border-color: #1b2b4b !important; font-size: 8px !important;
   }
-  .tooth-note-row { padding: 0 8px 3px !important; }
+  .tooth-note-row { padding: 0 7px 2px !important; }
 
-  .metal-checks { padding: 3px 8px 4px !important; gap: 6px !important; }
-  .check-item { padding: 0 2px !important; font-size: 9px !important; }
-  .check-item input[type="checkbox"] { width: 9px !important; height: 9px !important; }
+  /* 金属 */
+  .metal-checks { padding: 2px 7px 3px !important; gap: 5px !important; }
+  .check-item { padding: 0 1px !important; font-size: 7.5px !important; }
+  .check-item input[type="checkbox"] { width: 8px !important; height: 8px !important; }
   .metal-other-wrap input[type="text"] {
-    width: 90px !important; min-height: auto !important;
-    padding: 1px 4px !important; font-size: 9px !important;
+    width: 80px !important; min-height: unset !important;
+    padding: 0 3px !important; font-size: 7.5px !important;
   }
 
-  .gikou-col { padding: 3px 8px !important; }
-  .gikou-col-title { font-size: 9px !important; padding: 1px 6px !important; margin-bottom: 2px !important; }
-  .gikou-group { margin-bottom: 2px !important; }
-  .gikou-group-name { font-size: 8.5px !important; padding: 1px 5px !important; margin-bottom: 1px !important; }
-  .gikou-row { padding: 0 2px !important; margin-bottom: 0 !important; gap: 4px !important; }
+  /* 技工物 */
+  .gikou-grid { border-top: 0.75px solid #dde !important; }
+  .gikou-col { padding: 2px 7px !important; }
+  .gikou-col-title { font-size: 7.5px !important; padding: 0.5px 5px !important; margin-bottom: 1.5px !important; }
+  .gikou-group { margin-bottom: 1.5px !important; }
+  .gikou-group-name { font-size: 7px !important; padding: 0.5px 4px !important; margin-bottom: 1px !important; }
+  .gikou-row { padding: 0 1px !important; margin-bottom: 0 !important; gap: 3px !important; min-height: unset !important; }
   .gikou-row:hover { background: transparent !important; }
-  .gikou-part { font-size: 8.5px !important; min-width: 70px !important; }
-  .gikou-check { font-size: 8.5px !important; padding: 0 2px !important; gap: 2px !important; }
-  .gikou-check input[type="checkbox"] { width: 9px !important; height: 9px !important; }
+  .gikou-part { font-size: 7px !important; min-width: 60px !important; }
+  .gikou-check { font-size: 7px !important; padding: 0 1px !important; gap: 2px !important; }
+  .gikou-check input[type="checkbox"] { width: 8px !important; height: 8px !important; }
+  .gikou-check-group { gap: 6px !important; }
 
-  .note-full { padding: 3px 8px 4px !important; }
-  .note-tab-bar { display: none !important; }
+  /* 特記事項 */
+  .note-full { padding: 2px 7px 3px !important; }
   .note-pane { display: none !important; }
   .note-pane.has-content { display: block !important; }
   .note-pane textarea {
-    border: 1px solid #aaa !important;
+    border: 0.75px solid #aaa !important;
     background: transparent !important;
     border-radius: 0 !important;
-    padding: 4px 6px !important;
-    font-size: 9px !important;
-    min-height: 90px !important;
+    padding: 2px 5px !important;
+    font-size: 7.5px !important;
+    min-height: unset !important;
+    height: auto !important;
     width: 100% !important;
+    line-height: 1.4 !important;
+    resize: none !important;
   }
-  .canvas-toolbar { display: none !important; }
-  .canvas-wrap { border: 1px solid #aaa !important; }
-  .draw-canvas { height: 110px !important; }
 
-  @page { size: A4 portrait; margin: 6mm 6mm; }
+  /* 手書きキャンバス */
+  .canvas-wrap { border: 0.75px solid #aaa !important; }
+  .draw-canvas { height: 70px !important; }
+
+  /* 行の区切り線 */
+  .row { border-bottom: 0.5px solid #dde !important; }
+  .field { border-right-color: #dde !important; }
 }
 
 /* ===== iPad / mobile ===== */
