@@ -944,9 +944,7 @@ body {
   <div class="slot-nav" id="slotNav">
     <button class="slot-nav-arrow" id="slotPrev" onclick="changeSlot(-1)" title="前のカルテ">&#8592;</button>
     <div class="slot-nav-center">
-      <div class="slot-nav-label">カルテ番号</div>
       <div class="slot-nav-dots" id="slotDots"></div>
-      <div class="slot-nav-info" id="slotInfo">1 / 5</div>
       <div class="slot-saved-badge" id="slotSavedBadge"></div>
     </div>
     <div class="slot-action-btns">
@@ -1411,7 +1409,6 @@ function applyFormData(d){
 // ===== スロットUI更新 =====
 function updateSlotUI(){
   const total = slots.length;
-  document.getElementById('slotInfo').textContent = `${currentSlot+1} / ${total}`;
   document.getElementById('slotPrev').disabled = currentSlot === 0;
   document.getElementById('slotNext').disabled = currentSlot === total-1;
 
