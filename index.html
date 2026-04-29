@@ -1325,7 +1325,6 @@ body {
     <div class="slot-action-btns">
       <button class="slot-btn slot-btn-delete" onclick="deleteCurrentSlot()" id="slotDeleteBtn" title="この指示書を削除">🗑</button>
       <button class="slot-btn slot-btn-clear" onclick="clearCurrentSlot()">クリア</button>
-      <button class="slot-btn slot-btn-save" onclick="saveCurrentSlot()">💾 保存</button>
       <button class="slot-btn slot-btn-add" onclick="addNewSlot()" title="新規指示書を追加">＋ 新規</button>
     </div>
     <button class="slot-nav-arrow" id="slotNext" onclick="changeSlot(1)" title="次の指示書">&#8594;</button>
@@ -1890,10 +1889,10 @@ function updateSlotUI(){
   const badge = document.getElementById('slotSavedBadge');
   const t = savedTimes[currentSlot];
   if(t){
-    badge.textContent = `✓ 保存済 ${t}`;
+    badge.textContent = `✓ PDF保存済 ${t}`;
     badge.className = 'slot-saved-badge saved';
   } else {
-    badge.textContent = '未保存';
+    badge.textContent = 'PDF保存で自動記録';
     badge.className = 'slot-saved-badge';
   }
 
@@ -2334,6 +2333,14 @@ async function copyFilename(){
 }
 
 async function printPdf(){
+  // PDF保存時に自動でスロットを一時保存
+  slots[currentSlot] = collectFormData();
+  saveSlots();
+  const now = new Date();
+  savedTimes[currentSlot] = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  saveTimes();
+  updateSlotUI();
+
   const original = document.title;
   const fname = buildFilename().replace(/\.pdf$/, '');
   document.title = fname;
