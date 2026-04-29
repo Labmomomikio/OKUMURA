@@ -1287,18 +1287,18 @@ body {
 
   <!-- ===== スロットナビゲーター ===== -->
   <div class="slot-nav" id="slotNav">
-    <button class="slot-nav-arrow" id="slotPrev" onclick="changeSlot(-1)" title="前のカルテ">&#8592;</button>
+    <button class="slot-nav-arrow" id="slotPrev" onclick="changeSlot(-1)" title="前の指示書">&#8592;</button>
     <div class="slot-nav-center">
       <div class="slot-nav-dots" id="slotDots"></div>
       <div class="slot-saved-badge" id="slotSavedBadge"></div>
     </div>
     <div class="slot-action-btns">
-      <button class="slot-btn slot-btn-delete" onclick="deleteCurrentSlot()" id="slotDeleteBtn" title="このカルテを削除">🗑</button>
+      <button class="slot-btn slot-btn-delete" onclick="deleteCurrentSlot()" id="slotDeleteBtn" title="この指示書を削除">🗑</button>
       <button class="slot-btn slot-btn-clear" onclick="clearCurrentSlot()">クリア</button>
       <button class="slot-btn slot-btn-save" onclick="saveCurrentSlot()">💾 保存</button>
-      <button class="slot-btn slot-btn-add" onclick="addNewSlot()" title="新規カルテを追加">＋ 新規</button>
+      <button class="slot-btn slot-btn-add" onclick="addNewSlot()" title="新規指示書を追加">＋ 新規</button>
     </div>
-    <button class="slot-nav-arrow" id="slotNext" onclick="changeSlot(1)" title="次のカルテ">&#8594;</button>
+    <button class="slot-nav-arrow" id="slotNext" onclick="changeSlot(1)" title="次の指示書">&#8594;</button>
   </div>
 
   <div class="form-body">
@@ -1627,7 +1627,7 @@ body {
 
 <div class="toast" id="toast">ファイル名をコピーしました</div>
 
-<!-- ===== 納品チェック モーダル ===== -->
+
 <div class="delivery-modal-overlay" id="deliveryModalOverlay" onclick="handleDeliveryOverlayClick(event)">
   <div class="delivery-modal">
     <div class="delivery-modal-head">
@@ -1849,7 +1849,7 @@ function updateSlotUI(){
     for(let i=0;i<total;i++){
       const dot = document.createElement('button');
       dot.className = 'slot-dot' + (i===currentSlot?' active':'');
-      dot.title = `カルテ${i+1}`;
+      dot.title = `指示書${i+1}`;
       dot.onclick = ()=>{ if(i!==currentSlot) goToSlot(i); };
       dotsEl.appendChild(dot);
     }
@@ -1936,13 +1936,13 @@ function addNewSlot(){
       inner.style.opacity = '';
     }));
   }, 220);
-  showToast(`📋 カルテ${slots.length}を追加しました`);
+  showToast(`📋 指示書${slots.length}を追加しました`);
 }
 
 // ===== 削除 =====
 function deleteCurrentSlot(){
-  if(slots.length <= 1){ showToast('カルテは最低1枚必要です','#dc2626'); return; }
-  const name = slots[currentSlot].patientName || `カルテ${currentSlot+1}`;
+  if(slots.length <= 1){ showToast('指示書は最低1枚必要です','#dc2626'); return; }
+  const name = slots[currentSlot].patientName || `指示書${currentSlot+1}`;
   if(!confirm(`「${name}」を削除しますか？\nこの操作は元に戻せません。`)) return;
 
   slots.splice(currentSlot, 1);
@@ -1964,19 +1964,19 @@ function saveCurrentSlot(){
   savedTimes[currentSlot] = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
   saveTimes();
   updateSlotUI();
-  showToast(`💾 カルテ${currentSlot+1}を保存しました`);
+  showToast(`💾 指示書${currentSlot+1}を保存しました`);
 }
 
 // ===== クリアボタン =====
 function clearCurrentSlot(){
-  if(!confirm(`カルテ${currentSlot+1}の入力内容をクリアしますか？`)) return;
+  if(!confirm(`指示書${currentSlot+1}の入力内容をクリアしますか？`)) return;
   slots[currentSlot] = emptySlot();
   savedTimes[currentSlot] = null;
   saveSlots();
   saveTimes();
   applyFormData(slots[currentSlot]);
   updateSlotUI();
-  showToast(`🗑 カルテ${currentSlot+1}をクリアしました`);
+  showToast(`🗑 指示書${currentSlot+1}をクリアしました`);
 }
 
 // ===== スワイプ =====
@@ -2183,11 +2183,65 @@ function setToday(){
 }
 
 // ===== ファイル名 =====
+
+// 技工物サブカテゴリー → 短縮コード マッピング
+const GIKOU_CODE_MAP = {
+  'hoken-cadcam' : 'CAD',
+  'jihi-fz'      : 'FZ',
+  'jihi-zc'      : 'ZC',
+  'jihi-emax'    : 'EM',
+  'jihi-mb'      : 'MB',
+};
+
+/** チェック済み技工物の先頭1つの短縮コードを返す */
+function getGikouShortCode() {
+  // DOMから直接チェック済みのサブカテゴリーを探す（最初の1つ）
+  const subcats = document.querySelectorAll('.gikou-subcat');
+  for (const subcat of subcats) {
+    const hasCheck = subcat.querySelector('.gikou-check input[type="checkbox"]:checked');
+    if (hasCheck) {
+      const key = subcat.dataset.subcat || '';
+      return GIKOU_CODE_MAP[key] || subcat.querySelector('.gikou-subcat-label')?.textContent?.slice(0,4) || 'CR';
+    }
+  }
+  // サブカテゴリーにヒットしない場合はgikouChecksから推定
+  return 'CR';
+}
+
+/** 日付文字列 YYYY-MM-DD → YYMMDD */
+function toShortDate(dateStr) {
+  if (!dateStr) return '';
+  return dateStr.replace(/-/g, '').slice(2); // YYMMDDの6桁
+}
+
+/** 納品チェック済みか判定（現在のスロット） */
+function isDeliveryChecked() {
+  const issueDate = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
+  const checks = loadDeliveryChecks();
+  // 現在スロットのキーを検索
+  const key = `${issueDate}_${currentSlot}`;
+  return !!(checks[key]);
+}
+
 function buildFilename(){
-  const dRaw = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
-  const dateStr = dRaw.replace(/-/g, '');
-  const name = (document.getElementById('patient-name').value || '患者名').trim().replace(/[\\/:*?"<>|]/g, '');
-  return `${dateStr}_${name}_技工指示書.pdf`;
+  const issueRaw = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
+  const issueShort = toShortDate(issueRaw);
+
+  // 納品日は dates[1]（試適・納品日フィールド）から取得
+  const dates = document.querySelectorAll('.form-body-inner input[type="date"]');
+  const fitRaw = dates[1]?.value || '';
+  const fitShort = fitRaw ? toShortDate(fitRaw) : '';
+
+  const name = (document.getElementById('patient-name').value || '患者名')
+    .trim().replace(/[\\/:*?"<>|]/g, '');
+
+  const gikouCode = getGikouShortCode();
+
+  const checked = isDeliveryChecked() ? '_済' : '';
+
+  // 組み立て：発行日_納品日_患者名_技工物コード[_済].pdf
+  const parts = [issueShort, fitShort, name, gikouCode].filter(Boolean);
+  return parts.join('_') + checked + '.pdf';
 }
 function updateFilenameDisplay(){
   const el = document.getElementById('filename-display');
@@ -2195,6 +2249,19 @@ function updateFilenameDisplay(){
 }
 document.getElementById('patient-name').addEventListener('input', updateFilenameDisplay);
 document.getElementById('issue-date').addEventListener('change', updateFilenameDisplay);
+
+// 納品日（dates[1] = 試適・納品日）変更時もファイル名を更新
+(function(){
+  const dates = document.querySelectorAll('.form-body-inner input[type="date"]');
+  if (dates[1]) dates[1].addEventListener('change', updateFilenameDisplay);
+})();
+
+// 技工物チェック変更時もファイル名を更新（既存のdelegateに追記）
+document.addEventListener('change', function(e) {
+  if (e.target.matches('.gikou-check input[type="checkbox"]')) {
+    updateFilenameDisplay();
+  }
+});
 
 function showToast(msg, color){
   const t = document.getElementById('toast');
@@ -2479,6 +2546,8 @@ function toggleDeliveryItem(item, key) {
   item.querySelector('.delivery-badge').textContent = nowChecked ? '確認済' : '未確認';
   item.querySelector('.delivery-badge').className = 'delivery-badge' + (nowChecked ? ' done' : '');
   updateDeliveryProgress();
+  // ファイル名表示にも「済」を反映
+  updateFilenameDisplay();
 }
 
 /** プログレス表示更新 */
@@ -2505,6 +2574,7 @@ function resetDeliveryChecks() {
     item.querySelector('.delivery-badge').className = 'delivery-badge';
   });
   updateDeliveryProgress();
+  updateFilenameDisplay();
 }
 
 /** モーダルを閉じる */
