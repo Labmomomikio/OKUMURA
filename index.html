@@ -281,9 +281,9 @@ body {
   min-height: 36px;
 }
 
-/* 技工物（縦に詰める） */
+/* 技工物（ポップオーバー形式） */
 .gikou-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line-light); }
-.gikou-col { padding: 8px 12px 10px; border-right: 1px solid var(--line-light); }
+.gikou-col { padding: 10px 12px 12px; border-right: 1px solid var(--line-light); }
 .gikou-col:last-child { border-right: none; }
 .gikou-col-title {
   font-size: 12px; font-weight: 700;
@@ -292,22 +292,124 @@ body {
   padding: 3px 10px;
   border-radius: 4px;
   display: inline-block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
-.gikou-group { margin-bottom: 6px; }
-.gikou-group-name {
-  font-size: 11px; font-weight: 700;
+
+/* サブカテゴリーボタン群 */
+.gikou-subcat-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.gikou-subcat {
+  position: relative;
+}
+.gikou-subcat-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700;
   color: var(--blue);
   background: var(--blue-light);
-  padding: 2px 8px;
-  border-radius: 3px;
-  margin-bottom: 3px;
-  display: inline-block;
+  border: 1.5px solid transparent;
+  padding: 6px 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+  user-select: none;
 }
+.gikou-subcat-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.gikou-subcat-btn.has-checked {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.gikou-subcat-btn.has-checked:hover {
+  background: var(--accent);
+  filter: brightness(1.05);
+}
+.gikou-subcat-btn .gikou-caret {
+  font-size: 10px;
+  transition: transform 0.18s;
+  opacity: 0.7;
+}
+.gikou-subcat.open .gikou-subcat-btn {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.gikou-subcat.open .gikou-caret {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+.gikou-subcat-btn .gikou-count {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  min-width: 18px; height: 18px;
+  background: #fff; color: var(--accent);
+  border-radius: 9px;
+  font-size: 10px; font-weight: 800;
+  padding: 0 5px;
+  margin-left: 2px;
+}
+
+/* ポップオーバー本体 */
+.gikou-popover {
+  display: none;
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 260px;
+  max-width: min(360px, 92vw);
+  background: #fff;
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(20, 30, 60, 0.18), 0 4px 8px rgba(20, 30, 60, 0.08);
+  padding: 8px 10px 10px;
+  animation: gikou-popover-in 0.16s ease-out;
+}
+.gikou-subcat.open .gikou-popover { display: block; }
+/* 右寄せ（画面右端に近いボタン用） */
+.gikou-subcat.align-right .gikou-popover {
+  left: auto;
+  right: 0;
+}
+.gikou-popover::before {
+  content: "";
+  position: absolute;
+  top: -7px; left: 22px;
+  width: 12px; height: 12px;
+  background: #fff;
+  border-left: 1.5px solid var(--accent);
+  border-top: 1.5px solid var(--accent);
+  transform: rotate(45deg);
+}
+.gikou-subcat.align-right .gikou-popover::before {
+  left: auto; right: 22px;
+}
+@keyframes gikou-popover-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gikou-popover-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 700; color: var(--navy);
+  padding-bottom: 6px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--line-light);
+}
+.gikou-popover-close {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 18px; line-height: 1; color: var(--text-light);
+  padding: 2px 6px; border-radius: 4px;
+}
+.gikou-popover-close:hover { background: var(--blue-light); color: var(--navy); }
+
 .gikou-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 2px 4px; border-radius: 3px; margin-bottom: 1px;
-  flex-wrap: wrap; gap: 6px;
+  padding: 4px 6px; border-radius: 4px; margin-bottom: 2px;
+  flex-wrap: wrap; gap: 8px;
 }
 .gikou-row:hover { background: var(--blue-light); }
 .gikou-part { font-size: 12px; color: var(--text-mid); min-width: 100px; font-weight: 500; }
@@ -318,6 +420,9 @@ body {
   padding: 2px 5px; border-radius: 3px;
 }
 .gikou-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+/* 印刷時はポップオーバーを通常表示に戻す（既存の縦並びレイアウトと同じ見た目） */
+.gikou-print-group { display: none; }
 
 /* 補綴の図 */
 .figure-half-area {
@@ -878,15 +983,41 @@ body {
     padding: 0 3px !important; font-size: 7.5px !important;
   }
 
-  /* 技工物 */
+  /* 技工物 — 印刷時はチェック済みの項目のみ表示 */
   .gikou-grid { border-top: 0.75px solid #dde !important; }
   .gikou-col { padding: 2px 7px !important; }
   .gikou-col-title { font-size: 7.5px !important; padding: 0.5px 5px !important; margin-bottom: 1.5px !important; }
-  .gikou-group { margin-bottom: 1.5px !important; }
-  .gikou-group-name { font-size: 7px !important; padding: 0.5px 4px !important; margin-bottom: 1px !important; }
+  .gikou-subcat-list { display: block !important; }
+  .gikou-subcat { display: block !important; margin-bottom: 1.5px !important; }
+  /* チェック済み項目を含まないサブカテゴリーは丸ごと非表示 */
+  .gikou-subcat:not(.has-checked-print) { display: none !important; }
+  .gikou-subcat-btn {
+    display: inline-block !important;
+    background: transparent !important; color: #2563eb !important;
+    border: none !important; padding: 0 !important;
+    font-size: 7px !important; font-weight: 700 !important;
+    border-radius: 0 !important;
+  }
+  .gikou-subcat-btn .gikou-caret,
+  .gikou-subcat-btn .gikou-count { display: none !important; }
+  .gikou-popover {
+    display: block !important;
+    position: static !important;
+    border: none !important; box-shadow: none !important;
+    padding: 0 !important; margin: 0 !important;
+    min-width: 0 !important; max-width: none !important;
+    animation: none !important;
+    background: transparent !important;
+  }
+  .gikou-popover::before { display: none !important; }
+  .gikou-popover-head { display: none !important; }
+  /* チェックされた行のみ表示 */
+  .gikou-row:not(.has-checked-print) { display: none !important; }
   .gikou-row { padding: 0 1px !important; margin-bottom: 0 !important; gap: 3px !important; min-height: unset !important; }
   .gikou-row:hover { background: transparent !important; }
   .gikou-part { font-size: 7px !important; min-width: 60px !important; }
+  /* チェックされていないチェックボックス＋ラベルは非表示 */
+  .gikou-check:not(.has-checked-print) { display: none !important; }
   .gikou-check { font-size: 7px !important; padding: 0 1px !important; gap: 2px !important; }
   .gikou-check input[type="checkbox"] { width: 8px !important; height: 8px !important; }
   .gikou-check-group { gap: 6px !important; }
@@ -1149,51 +1280,105 @@ body {
       </div>
     </div>
 
-    <!-- ⑦ 技工物（縦に詰める） -->
+    <!-- ⑦ 技工物（ポップオーバー方式） -->
     <div class="section">
       <div class="section-head">技工物の種類</div>
       <div class="gikou-grid">
 
         <div class="gikou-col">
           <div class="gikou-col-title">技工物（保険）</div>
-          <div class="gikou-group">
-            <div class="gikou-group-name">CAM/CAM補綴</div>
-            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">インレー小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">インレー大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">クラウン小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">クラウン大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">エンドクラウン</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">PEEK冠（ホワイト）</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">PEEK冠（アイボリー）</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
+          <div class="gikou-subcat-list">
+            <div class="gikou-subcat" data-subcat="hoken-cadcam">
+              <button type="button" class="gikou-subcat-btn" onclick="toggleGikouSubcat(this)">
+                <span class="gikou-subcat-label">CAD/CAM補綴</span>
+                <span class="gikou-count" style="display:none">0</span>
+                <span class="gikou-caret">▼</span>
+              </button>
+              <div class="gikou-popover">
+                <div class="gikou-popover-head">
+                  <span>CAD/CAM補綴</span>
+                  <button type="button" class="gikou-popover-close" onclick="closeGikouSubcat(this)">×</button>
+                </div>
+                <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">インレー小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">インレー大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">クラウン小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">クラウン大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">エンドクラウン</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">PEEK冠（ホワイト）</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">PEEK冠(アイボリー)</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> 選択</label></div></div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="gikou-col">
           <div class="gikou-col-title">技工物（自費）</div>
-          <div class="gikou-group">
-            <div class="gikou-group-name">フルジルコニア</div>
-            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-          </div>
-          <div class="gikou-group">
-            <div class="gikou-group-name">ジルコニアセラミック</div>
-            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-          </div>
-          <div class="gikou-group">
-            <div class="gikou-group-name">e-max</div>
-            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-          </div>
-          <div class="gikou-group">
-            <div class="gikou-group-name">メタルボンド</div>
-            <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
-            <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+          <div class="gikou-subcat-list">
+            <div class="gikou-subcat" data-subcat="jihi-fz">
+              <button type="button" class="gikou-subcat-btn" onclick="toggleGikouSubcat(this)">
+                <span class="gikou-subcat-label">フルジルコニア</span>
+                <span class="gikou-count" style="display:none">0</span>
+                <span class="gikou-caret">▼</span>
+              </button>
+              <div class="gikou-popover">
+                <div class="gikou-popover-head">
+                  <span>フルジルコニア</span>
+                  <button type="button" class="gikou-popover-close" onclick="closeGikouSubcat(this)">×</button>
+                </div>
+                <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+              </div>
+            </div>
+            <div class="gikou-subcat" data-subcat="jihi-zc">
+              <button type="button" class="gikou-subcat-btn" onclick="toggleGikouSubcat(this)">
+                <span class="gikou-subcat-label">ジルコニアセラミック</span>
+                <span class="gikou-count" style="display:none">0</span>
+                <span class="gikou-caret">▼</span>
+              </button>
+              <div class="gikou-popover">
+                <div class="gikou-popover-head">
+                  <span>ジルコニアセラミック</span>
+                  <button type="button" class="gikou-popover-close" onclick="closeGikouSubcat(this)">×</button>
+                </div>
+                <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+              </div>
+            </div>
+            <div class="gikou-subcat" data-subcat="jihi-emax">
+              <button type="button" class="gikou-subcat-btn" onclick="toggleGikouSubcat(this)">
+                <span class="gikou-subcat-label">e-max</span>
+                <span class="gikou-count" style="display:none">0</span>
+                <span class="gikou-caret">▼</span>
+              </button>
+              <div class="gikou-popover">
+                <div class="gikou-popover-head">
+                  <span>e-max</span>
+                  <button type="button" class="gikou-popover-close" onclick="closeGikouSubcat(this)">×</button>
+                </div>
+                <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+              </div>
+            </div>
+            <div class="gikou-subcat" data-subcat="jihi-mb">
+              <button type="button" class="gikou-subcat-btn" onclick="toggleGikouSubcat(this)">
+                <span class="gikou-subcat-label">メタルボンド</span>
+                <span class="gikou-count" style="display:none">0</span>
+                <span class="gikou-caret">▼</span>
+              </button>
+              <div class="gikou-popover">
+                <div class="gikou-popover-head">
+                  <span>メタルボンド</span>
+                  <button type="button" class="gikou-popover-close" onclick="closeGikouSubcat(this)">×</button>
+                </div>
+                <div class="gikou-row"><span class="gikou-part">前歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">小臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+                <div class="gikou-row"><span class="gikou-part">大臼歯</span><div class="gikou-check-group"><label class="gikou-check"><input type="checkbox"> クラウン</label><label class="gikou-check"><input type="checkbox"> インレー</label></div></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1411,6 +1596,8 @@ function applyFormData(d){
   document.querySelectorAll('.gikou-check input[type="checkbox"]').forEach((cb,i)=>{
     cb.checked = (d.gikouChecks&&d.gikouChecks['g'+i])||false;
   });
+  // 技工物 サブカテゴリーボタンのバッジ更新
+  if (typeof updateGikouBadges === 'function') updateGikouBadges();
 
   // 特記事項テキスト
   const ntTextarea = document.querySelector('#note-text textarea');
@@ -1885,18 +2072,103 @@ async function printPdf(){
   document.getElementById('today-date').textContent = str;
 })();
 
+// ===== 技工物 サブカテゴリー ポップオーバー =====
+function toggleGikouSubcat(btn){
+  const subcat = btn.closest('.gikou-subcat');
+  const willOpen = !subcat.classList.contains('open');
+  // 他のサブカテゴリーを閉じる（同時に1つだけ開く）
+  document.querySelectorAll('.gikou-subcat.open').forEach(s => {
+    if (s !== subcat) s.classList.remove('open');
+  });
+  // 開く前に右端オーバーフロー判定
+  subcat.classList.remove('align-right');
+  if (willOpen) {
+    // ボタン位置から推定: ビューポート右半分以降のボタンは右寄せに
+    const btnRect = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    // ポップオーバーの想定幅 約280px。左寄せで右端を超えそうなら右寄せに切替
+    if (btnRect.left + 280 > vw - 8) {
+      subcat.classList.add('align-right');
+    }
+  }
+  subcat.classList.toggle('open', willOpen);
+}
+function closeGikouSubcat(closeBtn){
+  const subcat = closeBtn.closest('.gikou-subcat');
+  if (subcat) subcat.classList.remove('open');
+}
+// 外側クリックで閉じる
+document.addEventListener('click', function(e){
+  if (e.target.closest('.gikou-subcat')) return;
+  document.querySelectorAll('.gikou-subcat.open').forEach(s => s.classList.remove('open'));
+});
+// Escキーで閉じる
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.gikou-subcat.open').forEach(s => s.classList.remove('open'));
+  }
+});
+// バッジ（チェック数）の更新
+function updateGikouBadges(){
+  document.querySelectorAll('.gikou-subcat').forEach(subcat => {
+    const checked = subcat.querySelectorAll('.gikou-check input[type="checkbox"]:checked').length;
+    const btn = subcat.querySelector('.gikou-subcat-btn');
+    const countEl = subcat.querySelector('.gikou-count');
+    if (checked > 0) {
+      btn.classList.add('has-checked');
+      countEl.textContent = checked;
+      countEl.style.display = '';
+    } else {
+      btn.classList.remove('has-checked');
+      countEl.style.display = 'none';
+    }
+  });
+}
+// チェックボックス変更時にバッジ更新
+document.addEventListener('change', function(e){
+  if (e.target.matches('.gikou-check input[type="checkbox"]')) {
+    updateGikouBadges();
+  }
+});
+// 印刷時はすべて開いて表示する必要がないため（CSSで制御済み）、特別処理は不要
+window.addEventListener('beforeprint', function(){
+  // チェック済みの項目のみ印刷するため、該当要素にマーカークラスを付与
+  document.querySelectorAll('.gikou-check').forEach(label => {
+    const cb = label.querySelector('input[type="checkbox"]');
+    label.classList.toggle('has-checked-print', !!(cb && cb.checked));
+  });
+  document.querySelectorAll('.gikou-row').forEach(row => {
+    const anyChecked = row.querySelector('.gikou-check input[type="checkbox"]:checked');
+    row.classList.toggle('has-checked-print', !!anyChecked);
+  });
+  document.querySelectorAll('.gikou-subcat').forEach(sub => {
+    const anyChecked = sub.querySelector('.gikou-check input[type="checkbox"]:checked');
+    sub.classList.toggle('has-checked-print', !!anyChecked);
+  });
+});
+window.addEventListener('afterprint', function(){
+  // 印刷後はマーカークラスを削除
+  document.querySelectorAll('.has-checked-print').forEach(el => {
+    el.classList.remove('has-checked-print');
+  });
+});
+
+
+
+window.addEventListener('resize', function(){
+  if(document.getElementById('note-draw').classList.contains('active')) resizeCanvas();
+});
+
 // ===== 初期化 =====
 window.addEventListener('load', function(){
   initSlots();
   resizeCanvas();
   applyFormData(slots[currentSlot]);
   updateSlotUI();
+  updateGikouBadges();
   setTimeout(()=>{ resizeCanvas(); saveHistory(); }, 100);
 });
 
-window.addEventListener('resize', function(){
-  if(document.getElementById('note-draw').classList.contains('active')) resizeCanvas();
-});
 window.addEventListener('beforeprint', updateNotePrintFlags);
 </script>
 
