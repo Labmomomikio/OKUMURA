@@ -761,7 +761,33 @@ body {
 }
 .delivery-reset-btn:hover { border-color: #dc2626; color: #dc2626; }
 
-/* 納品チェックボタン（アクションバー内） */
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.btn-delivery-header {
+  background: #a89968;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  min-height: 36px;
+  transition: opacity 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-delivery-header:hover { opacity: 0.85; }
+.btn-delivery-header:active { transform: scale(0.95); }
+
+/* 納品チェックボタン（アクションバー内）※削除済みだが念のため残す */
 .btn-delivery {
   background: #a89968;
   color: #fff;
@@ -1010,6 +1036,7 @@ body {
   .canvas-toolbar,
   .today-btn,
   .slot-nav,
+  .btn-delivery-header,
   .figure-half-area input[type="file"],
   .figure-icon,
   .figure-hint-text { display: none !important; }
@@ -1282,7 +1309,10 @@ body {
       <div class="lab-brand-en">OKUMURASHIKEN</div>
       <div class="lab-brand-jp">有限会社　奥村歯研</div>
     </div>
-    <div class="header-sub" id="today-date"></div>
+    <div class="header-right">
+      <div class="header-sub" id="today-date"></div>
+      <button class="btn-delivery-header" onclick="openDeliveryModal()">📦 納品確認</button>
+    </div>
   </div>
 
   <!-- ===== スロットナビゲーター ===== -->
@@ -1619,7 +1649,6 @@ body {
 
   <!-- アクションバー -->
   <div class="action-bar">
-    <button class="btn btn-delivery" onclick="openDeliveryModal()">✅ 納品チェック</button>
     <button class="btn btn-print" onclick="printPdf()">🖨 印刷・PDF保存へ</button>
   </div>
 
@@ -2216,10 +2245,12 @@ function toShortDate(dateStr) {
 
 /** 納品チェック済みか判定（現在のスロット） */
 function isDeliveryChecked() {
-  const issueDate = document.getElementById('issue-date').value || new Date().toISOString().slice(0,10);
+  // キーは納品日ベースで統一
+  const dates = document.querySelectorAll('.form-body-inner input[type="date"]');
+  const fitDate = dates[1]?.value || '';
+  if (!fitDate) return false;
   const checks = loadDeliveryChecks();
-  // 現在スロットのキーを検索
-  const key = `${issueDate}_${currentSlot}`;
+  const key = `${fitDate}_${currentSlot}`;
   return !!(checks[key]);
 }
 
@@ -2482,10 +2513,10 @@ function openDeliveryModal() {
   const today = getTodayStr();
   const checks = loadDeliveryChecks();
 
-  // 本日分のslotsを抽出（最大10件）
+  // 本日分のslotsを抽出（納品日＝今日、最大10件）
   const todaySlots = slots
     .map((s, i) => ({ slot: s, idx: i }))
-    .filter(({ slot }) => slot.issueDate === today && slot.patientName)
+    .filter(({ slot }) => slot.fitDate === today && slot.patientName)
     .slice(0, 10);
 
   // 日付表示
@@ -2498,10 +2529,10 @@ function openDeliveryModal() {
   body.innerHTML = '';
 
   if (todaySlots.length === 0) {
-    body.innerHTML = '<div class="delivery-empty">📭 本日（発行日）の指示書データがありません</div>';
+    body.innerHTML = '<div class="delivery-empty">📭 本日（納品日）の指示書データがありません</div>';
   } else {
     todaySlots.forEach(({ slot, idx }) => {
-      const key = `${today}_${idx}`;
+      const key = `${slot.fitDate}_${idx}`;
       const isChecked = !!(checks[key]);
 
       const gikouCode = buildGikouCodeText(slot);
