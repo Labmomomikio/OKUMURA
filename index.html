@@ -583,6 +583,193 @@ body {
   margin-top: 2px;
 }
 
+/* ===== 納品チェック モーダル ===== */
+.delivery-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.55);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.delivery-modal-overlay.open {
+  display: flex;
+}
+.delivery-modal {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(10,20,60,0.28);
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: dm-in 0.18s ease-out;
+}
+@keyframes dm-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.delivery-modal-head {
+  background: var(--navy);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.delivery-modal-title {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.delivery-modal-date {
+  color: rgba(255,255,255,0.65);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.delivery-modal-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.delivery-modal-close:hover { background: rgba(255,255,255,0.28); }
+
+.delivery-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 14px 16px;
+}
+.delivery-empty {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+/* チェックリスト行 */
+.delivery-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  margin-bottom: 10px;
+  background: var(--input-bg);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.delivery-item:last-child { margin-bottom: 0; }
+.delivery-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+.delivery-item.checked {
+  background: #f0fdf4;
+  border-color: #16a34a;
+}
+.delivery-cb {
+  width: 28px; height: 28px;
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: background 0.12s, border-color 0.12s;
+}
+.delivery-item.checked .delivery-cb {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+.delivery-item-info { flex: 1; min-width: 0; }
+.delivery-patient {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.delivery-item.checked .delivery-patient {
+  color: #15803d;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+.delivery-gikou-code {
+  font-size: 12px;
+  color: var(--text-mid);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.delivery-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.delivery-badge.done { background: #16a34a; }
+
+.delivery-modal-foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  background: var(--blue-light);
+}
+.delivery-progress {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.delivery-reset-btn {
+  background: transparent;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-mid);
+  cursor: pointer;
+  min-height: 40px;
+}
+.delivery-reset-btn:hover { border-color: #dc2626; color: #dc2626; }
+
+/* 納品チェックボタン（アクションバー内） */
+.btn-delivery {
+  background: #a89968;
+  color: #fff;
+  font-size: 15px;
+  padding: 13px 24px;
+}
+.btn-delivery:hover { opacity: 0.88; }
+
 /* アクションバー */
 .action-bar {
   display: flex; justify-content: flex-end; gap: 10px;
@@ -1432,12 +1619,33 @@ body {
 
   <!-- アクションバー -->
   <div class="action-bar">
+    <button class="btn btn-delivery" onclick="openDeliveryModal()">✅ 納品チェック</button>
     <button class="btn btn-print" onclick="printPdf()">🖨 印刷・PDF保存へ</button>
   </div>
 
 </div><!-- /form-wrap -->
 
 <div class="toast" id="toast">ファイル名をコピーしました</div>
+
+<!-- ===== 納品チェック モーダル ===== -->
+<div class="delivery-modal-overlay" id="deliveryModalOverlay" onclick="handleDeliveryOverlayClick(event)">
+  <div class="delivery-modal">
+    <div class="delivery-modal-head">
+      <div>
+        <div class="delivery-modal-title">📦 納品チェック</div>
+        <div class="delivery-modal-date" id="deliveryModalDate"></div>
+      </div>
+      <button class="delivery-modal-close" onclick="closeDeliveryModal()">✕</button>
+    </div>
+    <div class="delivery-modal-body" id="deliveryModalBody">
+      <!-- JSで生成 -->
+    </div>
+    <div class="delivery-modal-foot">
+      <div class="delivery-progress" id="deliveryProgress">0 / 0 確認済</div>
+      <button class="delivery-reset-btn" onclick="resetDeliveryChecks()">リセット</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ===== 定数 =====
@@ -2157,6 +2365,161 @@ window.addEventListener('afterprint', function(){
 
 window.addEventListener('resize', function(){
   if(document.getElementById('note-draw').classList.contains('active')) resizeCanvas();
+});
+
+// ===== 納品チェック機能 =====
+const DELIVERY_CHECK_KEY = 'okumura_delivery_checks';
+
+/** 技工物チェックボックスのラベルテキスト一覧を収集してコード文字列を生成 */
+function buildGikouCodeText(slot) {
+  // gikouChecks の true なものを収集する
+  // DOM上のチェックボックスラベルテキストをインデックスで対応させる
+  const labels = [...document.querySelectorAll('.gikou-check')].map(el => {
+    // ラベルのテキスト（チェックボックス除く）
+    return el.textContent.trim();
+  });
+  if (!slot.gikouChecks) return '－';
+  const selected = Object.entries(slot.gikouChecks)
+    .filter(([k, v]) => v)
+    .map(([k]) => {
+      const idx = parseInt(k.replace('g', ''), 10);
+      return labels[idx] || '';
+    })
+    .filter(Boolean);
+  return selected.length > 0 ? selected.slice(0, 5).join(' / ') : '－';
+}
+
+/** 今日の日付文字列（YYYY-MM-DD）を取得 */
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** LocalStorageから本日のチェック状態を取得 */
+function loadDeliveryChecks() {
+  try {
+    const raw = localStorage.getItem(DELIVERY_CHECK_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+
+/** LocalStorageにチェック状態を保存 */
+function saveDeliveryChecks(data) {
+  try { localStorage.setItem(DELIVERY_CHECK_KEY, JSON.stringify(data)); } catch (e) {}
+}
+
+/** 納品チェックモーダルを開く */
+function openDeliveryModal() {
+  // 現在のフォームを最新の状態にしておく
+  slots[currentSlot] = collectFormData();
+
+  const today = getTodayStr();
+  const checks = loadDeliveryChecks();
+
+  // 本日分のslotsを抽出（最大10件）
+  const todaySlots = slots
+    .map((s, i) => ({ slot: s, idx: i }))
+    .filter(({ slot }) => slot.issueDate === today && slot.patientName)
+    .slice(0, 10);
+
+  // 日付表示
+  const d = new Date();
+  document.getElementById('deliveryModalDate').textContent =
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 の納品対象`;
+
+  // リスト生成
+  const body = document.getElementById('deliveryModalBody');
+  body.innerHTML = '';
+
+  if (todaySlots.length === 0) {
+    body.innerHTML = '<div class="delivery-empty">📭 本日（発行日）の指示書データがありません</div>';
+  } else {
+    todaySlots.forEach(({ slot, idx }) => {
+      const key = `${today}_${idx}`;
+      const isChecked = !!(checks[key]);
+
+      const gikouCode = buildGikouCodeText(slot);
+
+      const item = document.createElement('div');
+      item.className = 'delivery-item' + (isChecked ? ' checked' : '');
+      item.dataset.key = key;
+      item.innerHTML = `
+        <div class="delivery-cb">${isChecked ? '✓' : ''}</div>
+        <div class="delivery-item-info">
+          <div class="delivery-patient">${escapeHtml(slot.patientName)}</div>
+          <div class="delivery-gikou-code">${escapeHtml(gikouCode)}</div>
+        </div>
+        <div class="delivery-badge${isChecked ? ' done' : ''}">${isChecked ? '確認済' : '未確認'}</div>
+      `;
+      item.addEventListener('click', () => toggleDeliveryItem(item, key));
+      body.appendChild(item);
+    });
+  }
+
+  updateDeliveryProgress();
+  document.getElementById('deliveryModalOverlay').classList.add('open');
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** チェック切り替え */
+function toggleDeliveryItem(item, key) {
+  const checks = loadDeliveryChecks();
+  const nowChecked = !item.classList.contains('checked');
+  checks[key] = nowChecked;
+  saveDeliveryChecks(checks);
+
+  item.classList.toggle('checked', nowChecked);
+  item.querySelector('.delivery-cb').textContent = nowChecked ? '✓' : '';
+  item.querySelector('.delivery-badge').textContent = nowChecked ? '確認済' : '未確認';
+  item.querySelector('.delivery-badge').className = 'delivery-badge' + (nowChecked ? ' done' : '');
+  updateDeliveryProgress();
+}
+
+/** プログレス表示更新 */
+function updateDeliveryProgress() {
+  const items = document.querySelectorAll('#deliveryModalBody .delivery-item');
+  const total = items.length;
+  const done  = [...items].filter(i => i.classList.contains('checked')).length;
+  document.getElementById('deliveryProgress').textContent = `${done} / ${total} 確認済`;
+}
+
+/** チェックをリセット */
+function resetDeliveryChecks() {
+  if (!confirm('本日のチェック状態をすべてリセットしますか？')) return;
+  const today = getTodayStr();
+  const checks = loadDeliveryChecks();
+  // 本日分のキーだけ削除
+  Object.keys(checks).forEach(k => { if (k.startsWith(today)) delete checks[k]; });
+  saveDeliveryChecks(checks);
+  // リスト再描画
+  document.querySelectorAll('#deliveryModalBody .delivery-item').forEach(item => {
+    item.classList.remove('checked');
+    item.querySelector('.delivery-cb').textContent = '';
+    item.querySelector('.delivery-badge').textContent = '未確認';
+    item.querySelector('.delivery-badge').className = 'delivery-badge';
+  });
+  updateDeliveryProgress();
+}
+
+/** モーダルを閉じる */
+function closeDeliveryModal() {
+  document.getElementById('deliveryModalOverlay').classList.remove('open');
+}
+
+/** オーバーレイ背景クリックで閉じる */
+function handleDeliveryOverlayClick(e) {
+  if (e.target === document.getElementById('deliveryModalOverlay')) closeDeliveryModal();
+}
+
+// Escキーでも閉じる（既存keydownリスナーに追記するためここで別途登録）
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDeliveryModal();
 });
 
 // ===== 初期化 =====
